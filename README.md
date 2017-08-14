@@ -1,0 +1,2 @@
+# simple_vulkan_synchronization
+Simplified Vulkan synchronization header
