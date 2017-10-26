@@ -40,6 +40,16 @@ USAGE
 
 VERSION
 
+    alpha.2
+    
+    Alpha.2 adds four new resource states for "ANY SHADER ACCESS":
+     - THSVS_ACCESS_ANY_SHADER_READ_UNIFORM_BUFFER
+     - THSVS_ACCESS_ANY_SHADER_READ_SAMPLED_IMAGE
+     - THSVS_ACCESS_ANY_SHADER_READ_OTHER
+     - THSVS_ACCESS_ANY_SHADER_WRITE
+	
+VERSION HISTORY
+
     alpha.1
     
     Alpha.1 adds three new resource states:
@@ -48,8 +58,6 @@ VERSION
      - THSVS_ACCESS_STENCIL_ATTACHMENT_WRITE_DEPTH_READ_ONLY (Write access to only the stencil aspect of a depth/stencil attachment)
      
     It also fixes a couple of typos, and adds clarification as to when extensions need to be enabled to use a feature.
-
-VERSION HISTORY
 
     alpha.0
 
@@ -166,6 +174,9 @@ typedef enum ThsvsAccessType {
     THSVS_ACCESS_COMPUTE_SHADER_READ_UNIFORM_BUFFER,                        // Read as a uniform buffer in a compute shader
     THSVS_ACCESS_COMPUTE_SHADER_READ_SAMPLED_IMAGE,                         // Read as a sampled image in a compute shader
     THSVS_ACCESS_COMPUTE_SHADER_READ_OTHER,                                 // Read as any other resource in a compute shader
+    THSVS_ACCESS_ANY_SHADER_READ_UNIFORM_BUFFER,                            // Read as a uniform buffer in any shader
+    THSVS_ACCESS_ANY_SHADER_READ_SAMPLED_IMAGE,                             // Read as a sampled image in any shader
+    THSVS_ACCESS_ANY_SHADER_READ_OTHER,                                     // Read as any other resource (excluding attachments) in any shader
     THSVS_ACCESS_TRANSFER_READ,                                             // Read as the source of a transfer operation
     THSVS_ACCESS_HOST_READ,                                                 // Read on the host
     THSVS_ACCESS_PRESENT,                                                   // Read by the presentation engine (i.e. vkQueuePresentKHR)
@@ -187,6 +198,7 @@ typedef enum ThsvsAccessType {
     THSVS_ACCESS_STENCIL_ATTACHMENT_WRITE_DEPTH_READ_ONLY,                  // Written as a stencil aspect of a depth/stencil attachment during rendering, whilst the depth aspect is read-only
 	
     THSVS_ACCESS_COMPUTE_SHADER_WRITE,                                      // Written as any resource in a compute shader
+    THSVS_ACCESS_ANY_SHADER_WRITE,                                      // Written as any resource in any shader
     THSVS_ACCESS_TRANSFER_WRITE,                                            // Written as the destination of a transfer operation
     THSVS_ACCESS_HOST_WRITE,                                                // Written on the host
 
@@ -564,6 +576,19 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
         VK_ACCESS_SHADER_READ_BIT,
         VK_IMAGE_LAYOUT_GENERAL},
 
+    // THSVS_ACCESS_ANY_SHADER_READ_UNIFORM_BUFFER
+    {   VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+        VK_ACCESS_UNIFORM_READ_BIT,
+        VK_IMAGE_LAYOUT_UNDEFINED},
+    // THSVS_ACCESS_ANY_SHADER_READ_SAMPLED_IMAGE
+    {   VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+        VK_ACCESS_SHADER_READ_BIT,
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL },
+    // THSVS_ACCESS_ANY_SHADER_READ_OTHER
+    {   VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+        VK_ACCESS_SHADER_READ_BIT,
+        VK_IMAGE_LAYOUT_GENERAL},
+
     // THSVS_ACCESS_TRANSFER_READ
     {   VK_PIPELINE_STAGE_TRANSFER_BIT,
         VK_ACCESS_TRANSFER_READ_BIT,
@@ -622,6 +647,11 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
 
     // THSVS_ACCESS_COMPUTE_SHADER_WRITE
     {   VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+        VK_ACCESS_SHADER_WRITE_BIT,
+        VK_IMAGE_LAYOUT_GENERAL},
+		
+    // THSVS_ACCESS_ANY_SHADER_WRITE
+    {   VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
         VK_ACCESS_SHADER_WRITE_BIT,
         VK_IMAGE_LAYOUT_GENERAL},
 
