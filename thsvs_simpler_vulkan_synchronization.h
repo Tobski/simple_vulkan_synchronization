@@ -127,7 +127,9 @@ typedef enum ThsvsAccessType {
     THSVS_ACCESS_NONE,                                                      // No access. Useful primarily for intialisation
 
 // Read access
+	// Requires VK_NVX_device_generated_commands to be enabled
     THSVS_ACCESS_COMMAND_BUFFER_READ_NVX,                                   // Command buffer read operation as defined by NVX_device_generated_commands
+	
     THSVS_ACCESS_INDIRECT_BUFFER,                                           // Read as an indirect buffer for drawing or dispatch
     THSVS_ACCESS_INDEX_BUFFER,                                              // Read as an index buffer for drawing
     THSVS_ACCESS_VERTEX_BUFFER,                                             // Read as a vertex buffer for drawing
@@ -146,10 +148,10 @@ typedef enum ThsvsAccessType {
     THSVS_ACCESS_FRAGMENT_SHADER_READ_UNIFORM_BUFFER,                       // Read as a uniform buffer in a fragment shader
     THSVS_ACCESS_FRAGMENT_SHADER_READ_SAMPLED_IMAGE,                        // Read as a sampled image in a fragment shader
     THSVS_ACCESS_FRAGMENT_SHADER_READ_COLOR_INPUT_ATTACHMENT,               // Read as an input attachment with a color format in a fragment shader
-    THSVS_ACCESS_FRAGMENT_SHADER_READ_DEPTH_STENCIL_INPUT_ATTACHMENT,    // Read as an input attachment with a depth/stencil format in a fragment shader
+    THSVS_ACCESS_FRAGMENT_SHADER_READ_DEPTH_STENCIL_INPUT_ATTACHMENT,       // Read as an input attachment with a depth/stencil format in a fragment shader
     THSVS_ACCESS_FRAGMENT_SHADER_READ_OTHER,                                // Read as any other resource in a fragment shader
     THSVS_ACCESS_COLOR_ATTACHMENT_READ,                                     // Read by blending/logic operations or subpass load operations
-    THSVS_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ,                          // Read by depth/stencil tests or subpass load operations
+    THSVS_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ,                             // Read by depth/stencil tests or subpass load operations
     THSVS_ACCESS_COMPUTE_SHADER_READ_UNIFORM_BUFFER,                        // Read as a uniform buffer in a compute shader
     THSVS_ACCESS_COMPUTE_SHADER_READ_SAMPLED_IMAGE,                         // Read as a sampled image in a compute shader
     THSVS_ACCESS_COMPUTE_SHADER_READ_OTHER,                                 // Read as any other resource in a compute shader
@@ -158,14 +160,16 @@ typedef enum ThsvsAccessType {
     THSVS_ACCESS_PRESENT,                                                   // Read by the presentation engine (i.e. vkQueuePresentKHR)
 
 // Write access
-    THSVS_ACCESS_COMMAND_BUFFER_WRITE_NVX,                                  // Command buffer write operation as defined by NVX_device_generated_commands
+	// Requires VK_NVX_device_generated_commands to be enabled
+    THSVS_ACCESS_COMMAND_BUFFER_WRITE_NVX,                                  // Command buffer write operation as defined by VK_NVX_device_generated_commands
+	
     THSVS_ACCESS_VERTEX_SHADER_WRITE,                                       // Written as any resource in a vertex shader
     THSVS_ACCESS_TESSELLATION_CONTROL_SHADER_WRITE,                         // Written as any resource in a tessellation control shader
     THSVS_ACCESS_TESSELLATION_EVALUATION_SHADER_WRITE,                      // Written as any resource in a tessellation evaluation shader
     THSVS_ACCESS_GEOMETRY_SHADER_WRITE,                                     // Written as any resource in a geometry shader
     THSVS_ACCESS_FRAGMENT_SHADER_WRITE,                                     // Written as any resource in a fragment shader
     THSVS_ACCESS_COLOR_ATTACHMENT_WRITE,                                    // Written as a color attachment during rendering
-    THSVS_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE,                         // Written as a depth/stencil attachment during rendering
+    THSVS_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE,                            // Written as a depth/stencil attachment during rendering
     THSVS_ACCESS_COMPUTE_SHADER_WRITE,                                      // Written as any resource in a compute shader
     THSVS_ACCESS_TRANSFER_WRITE,                                            // Written as the destination of a transfer operation
     THSVS_ACCESS_HOST_WRITE,                                                // Written on the host
@@ -183,6 +187,8 @@ THSVS_IMAGE_LAYOUT_OPTIMAL is usually preferred.
 typedef enum ThsvsImageLayout {
     THSVS_IMAGE_LAYOUT_OPTIMAL,                 // Choose the most optimal layout for each usage. Performs layout transitions as appropriate for the access.
     THSVS_IMAGE_LAYOUT_GENERAL,                 // Layout accessible by all Vulkan access types on a device - no layout transitions except for presentation
+	
+	// Requires VK_KHR_shared_presentable_image to be enabled. Can only be used for shared presentable images (i.e. single-buffered swapchains).
     THSVS_IMAGE_LAYOUT_GENERAL_AND_PRESENTATION // As GENERAL, but also allows presentation engines to access it - no layout transitions
 } ThsvsImageLayout;
 
