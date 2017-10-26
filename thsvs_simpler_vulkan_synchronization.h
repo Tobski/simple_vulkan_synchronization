@@ -40,6 +40,17 @@ USAGE
 
 VERSION
 
+    alpha.1
+    
+    Alpha.1 adds three new resource states:
+     - THSVS_ACCESS_GENERAL (Any access on the device)
+     - THSVS_ACCESS_DEPTH_ATTACHMENT_WRITE_STENCIL_READ_ONLY (Write access to only the depth aspect of a depth/stencil attachment)
+     - THSVS_ACCESS_STENCIL_ATTACHMENT_WRITE_DEPTH_READ_ONLY (Write access to only the stencil aspect of a depth/stencil attachment)
+     
+    It also fixes a couple of typos, and adds clarification as to when extensions need to be enabled to use a feature.
+
+VERSION HISTORY
+
     alpha.0
 
     This is the very first public release of this library; future revisions
@@ -142,9 +153,9 @@ typedef enum ThsvsAccessType {
     THSVS_ACCESS_TESSELLATION_EVALUATION_SHADER_READ_UNIFORM_BUFFER,        // Read as a uniform buffer in a tessellation evaluation shader
     THSVS_ACCESS_TESSELLATION_EVALUATION_SHADER_READ_SAMPLED_IMAGE,         // Read as a sampled image in a tessellation evaluation shader
     THSVS_ACCESS_TESSELLATION_EVALUATION_SHADER_READ_OTHER,                 // Read as any other resource in a tessellation evaluation shader
-    THSVS_ACCESS_GEOMETRY_SHADER_READ_UNIFORM_BUFFER,                       // Read as a uniform buffer in a gepmetry shader
-    THSVS_ACCESS_GEOMETRY_SHADER_READ_SAMPLED_IMAGE,                        // Read as a sampled image in a gepmetry shader
-    THSVS_ACCESS_GEOMETRY_SHADER_READ_OTHER,                                // Read as any other resource in a gepmetry shader
+    THSVS_ACCESS_GEOMETRY_SHADER_READ_UNIFORM_BUFFER,                       // Read as a uniform buffer in a geometry shader
+    THSVS_ACCESS_GEOMETRY_SHADER_READ_SAMPLED_IMAGE,                        // Read as a sampled image in a geometry shader
+    THSVS_ACCESS_GEOMETRY_SHADER_READ_OTHER,                                // Read as any other resource in a geometry shader
     THSVS_ACCESS_FRAGMENT_SHADER_READ_UNIFORM_BUFFER,                       // Read as a uniform buffer in a fragment shader
     THSVS_ACCESS_FRAGMENT_SHADER_READ_SAMPLED_IMAGE,                        // Read as a sampled image in a fragment shader
     THSVS_ACCESS_FRAGMENT_SHADER_READ_COLOR_INPUT_ATTACHMENT,               // Read as an input attachment with a color format in a fragment shader
