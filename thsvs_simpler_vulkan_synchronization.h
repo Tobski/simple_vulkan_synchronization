@@ -170,9 +170,17 @@ typedef enum ThsvsAccessType {
     THSVS_ACCESS_FRAGMENT_SHADER_WRITE,                                     // Written as any resource in a fragment shader
     THSVS_ACCESS_COLOR_ATTACHMENT_WRITE,                                    // Written as a color attachment during rendering
     THSVS_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE,                            // Written as a depth/stencil attachment during rendering
+	
+	// Requires VK_KHR_maintenance2 to be enabled
+    THSVS_ACCESS_DEPTH_ATTACHMENT_WRITE_STENCIL_READ_ONLY,                  // Written as a depth aspect of a depth/stencil attachment during rendering, whilst the stencil aspect is read-only
+    THSVS_ACCESS_STENCIL_ATTACHMENT_WRITE_DEPTH_READ_ONLY,                  // Written as a stencil aspect of a depth/stencil attachment during rendering, whilst the depth aspect is read-only
+	
     THSVS_ACCESS_COMPUTE_SHADER_WRITE,                                      // Written as any resource in a compute shader
     THSVS_ACCESS_TRANSFER_WRITE,                                            // Written as the destination of a transfer operation
     THSVS_ACCESS_HOST_WRITE,                                                // Written on the host
+
+// General access
+    THSVS_ACCESS_GENERAL,                                                   // Covers any access - useful for debug, generally avoid for performance reasons
 
 // Number of access types
     THSVS_NUM_ACCESS_TYPES
@@ -592,6 +600,14 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
     {   VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
         VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
         VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL},
+    // THSVS_ACCESS_DEPTH_ATTACHMENT_WRITE_STENCIL_READ_ONLY
+    {   VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+        VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT,
+        VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL_KHR},
+    // THSVS_ACCESS_STENCIL_ATTACHMENT_WRITE_DEPTH_READ_ONLY
+    {   VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+        VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT,
+        VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL_KHR},
 
     // THSVS_ACCESS_COMPUTE_SHADER_WRITE
     {   VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
@@ -605,6 +621,10 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
     // THSVS_ACCESS_HOST_WRITE
     {   VK_PIPELINE_STAGE_HOST_BIT,
         VK_ACCESS_HOST_WRITE_BIT,
+        VK_IMAGE_LAYOUT_GENERAL},
+    // THSVS_ACCESS_GENERAL
+    {   VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+		VK_ACCESS_TYPE_MEMORY_READ_BIT | VK_ACCESS_TYPE_MEMORY_WRITE_BIT,
         VK_IMAGE_LAYOUT_GENERAL}
 };
 
