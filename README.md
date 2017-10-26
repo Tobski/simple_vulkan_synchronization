@@ -20,6 +20,17 @@ will be generated in that file.
 
 ## Version
 
+alpha.1
+
+Alpha.1 adds three new resource states:
+ - THSVS_ACCESS_GENERAL (Any access on the device)
+ - THSVS_ACCESS_DEPTH_ATTACHMENT_WRITE_STENCIL_READ_ONLY (Write access to only the depth aspect of a depth/stencil attachment)
+ - THSVS_ACCESS_STENCIL_ATTACHMENT_WRITE_DEPTH_READ_ONLY (Write access to only the stencil aspect of a depth/stencil attachment)
+
+It also fixes a couple of typos, and adds clarification as to when extensions need to be enabled to use a feature.
+
+## Version History
+
 alpha.0
 
 This is the very first public release of this library; future revisions
