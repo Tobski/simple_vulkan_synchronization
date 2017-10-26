@@ -20,6 +20,16 @@ will be generated in that file.
 
 ## Version
 
+alpha.2
+
+Alpha.2 adds four new resource states for "ANY SHADER ACCESS":
+ - THSVS_ACCESS_ANY_SHADER_READ_UNIFORM_BUFFER
+ - THSVS_ACCESS_ANY_SHADER_READ_SAMPLED_IMAGE
+ - THSVS_ACCESS_ANY_SHADER_READ_OTHER
+ - THSVS_ACCESS_ANY_SHADER_WRITE
+
+## Version History
+
 alpha.1
 
 Alpha.1 adds three new resource states:
@@ -28,8 +38,6 @@ Alpha.1 adds three new resource states:
  - THSVS_ACCESS_STENCIL_ATTACHMENT_WRITE_DEPTH_READ_ONLY (Write access to only the stencil aspect of a depth/stencil attachment)
 
 It also fixes a couple of typos, and adds clarification as to when extensions need to be enabled to use a feature.
-
-## Version History
 
 alpha.0
 
