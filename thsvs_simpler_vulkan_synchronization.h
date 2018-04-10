@@ -40,6 +40,20 @@ USAGE
 
 VERSION
 
+    alpha.3
+    
+    Alpha.3 changes the following:
+	
+	Uniform and vertex buffer access in one enum, matching D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER:
+	 - THSVS_ACCESS_ANY_SHADER_READ_UNIFORM_BUFFER_OR_VERTEX_BUFFER
+	 
+	Color read *and* write access, matching D3D12_RESOURCE_STATE_RENDER_TARGET:
+     - THSVS_ACCESS_COLOR_ATTACHMENT_READ_WRITE
+	 
+	Also the "THSVS_ACCESS_*_SHADER_READ_SAMPLED_IMAGE" enums have been renamed to the form "THSVS_ACCESS_*_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER"
+    
+VERSION HISTORY
+
     alpha.2
     
     Alpha.2 adds four new resource states for "ANY SHADER ACCESS":
@@ -47,8 +61,6 @@ VERSION
      - THSVS_ACCESS_ANY_SHADER_READ_SAMPLED_IMAGE
      - THSVS_ACCESS_ANY_SHADER_READ_OTHER
      - THSVS_ACCESS_ANY_SHADER_WRITE
-	
-VERSION HISTORY
 
     alpha.1
     
@@ -153,29 +165,30 @@ typedef enum ThsvsAccessType {
     THSVS_ACCESS_INDEX_BUFFER,                                              // Read as an index buffer for drawing
     THSVS_ACCESS_VERTEX_BUFFER,                                             // Read as a vertex buffer for drawing
     THSVS_ACCESS_VERTEX_SHADER_READ_UNIFORM_BUFFER,                         // Read as a uniform buffer in a vertex shader
-    THSVS_ACCESS_VERTEX_SHADER_READ_SAMPLED_IMAGE,                          // Read as a sampled image in a vertex shader
+    THSVS_ACCESS_VERTEX_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER,  // Read as a sampled image/uniform texel buffer in a vertex shader
     THSVS_ACCESS_VERTEX_SHADER_READ_OTHER,                                  // Read as any other resource in a vertex shader
     THSVS_ACCESS_TESSELLATION_CONTROL_SHADER_READ_UNIFORM_BUFFER,           // Read as a uniform buffer in a tessellation control shader
-    THSVS_ACCESS_TESSELLATION_CONTROL_SHADER_READ_SAMPLED_IMAGE,            // Read as a sampled image in a tessellation control shader
+    THSVS_ACCESS_TESSELLATION_CONTROL_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER, // Read as a sampled image/uniform texel buffer  in a tessellation control shader
     THSVS_ACCESS_TESSELLATION_CONTROL_SHADER_READ_OTHER,                    // Read as any other resource in a tessellation control shader
     THSVS_ACCESS_TESSELLATION_EVALUATION_SHADER_READ_UNIFORM_BUFFER,        // Read as a uniform buffer in a tessellation evaluation shader
-    THSVS_ACCESS_TESSELLATION_EVALUATION_SHADER_READ_SAMPLED_IMAGE,         // Read as a sampled image in a tessellation evaluation shader
+    THSVS_ACCESS_TESSELLATION_EVALUATION_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER, // Read as a sampled image/uniform texel buffer in a tessellation evaluation shader
     THSVS_ACCESS_TESSELLATION_EVALUATION_SHADER_READ_OTHER,                 // Read as any other resource in a tessellation evaluation shader
     THSVS_ACCESS_GEOMETRY_SHADER_READ_UNIFORM_BUFFER,                       // Read as a uniform buffer in a geometry shader
-    THSVS_ACCESS_GEOMETRY_SHADER_READ_SAMPLED_IMAGE,                        // Read as a sampled image in a geometry shader
+    THSVS_ACCESS_GEOMETRY_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER,// Read as a sampled image/uniform texel buffer  in a geometry shader
     THSVS_ACCESS_GEOMETRY_SHADER_READ_OTHER,                                // Read as any other resource in a geometry shader
     THSVS_ACCESS_FRAGMENT_SHADER_READ_UNIFORM_BUFFER,                       // Read as a uniform buffer in a fragment shader
-    THSVS_ACCESS_FRAGMENT_SHADER_READ_SAMPLED_IMAGE,                        // Read as a sampled image in a fragment shader
+    THSVS_ACCESS_FRAGMENT_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER,// Read as a sampled image/uniform texel buffer  in a fragment shader
     THSVS_ACCESS_FRAGMENT_SHADER_READ_COLOR_INPUT_ATTACHMENT,               // Read as an input attachment with a color format in a fragment shader
     THSVS_ACCESS_FRAGMENT_SHADER_READ_DEPTH_STENCIL_INPUT_ATTACHMENT,       // Read as an input attachment with a depth/stencil format in a fragment shader
     THSVS_ACCESS_FRAGMENT_SHADER_READ_OTHER,                                // Read as any other resource in a fragment shader
     THSVS_ACCESS_COLOR_ATTACHMENT_READ,                                     // Read by blending/logic operations or subpass load operations
     THSVS_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ,                             // Read by depth/stencil tests or subpass load operations
     THSVS_ACCESS_COMPUTE_SHADER_READ_UNIFORM_BUFFER,                        // Read as a uniform buffer in a compute shader
-    THSVS_ACCESS_COMPUTE_SHADER_READ_SAMPLED_IMAGE,                         // Read as a sampled image in a compute shader
+    THSVS_ACCESS_COMPUTE_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER, // Read as a sampled image/uniform texel buffer in a compute shader
     THSVS_ACCESS_COMPUTE_SHADER_READ_OTHER,                                 // Read as any other resource in a compute shader
     THSVS_ACCESS_ANY_SHADER_READ_UNIFORM_BUFFER,                            // Read as a uniform buffer in any shader
-    THSVS_ACCESS_ANY_SHADER_READ_SAMPLED_IMAGE,                             // Read as a sampled image in any shader
+    THSVS_ACCESS_ANY_SHADER_READ_UNIFORM_BUFFER_OR_VERTEX_BUFFER,           // Read as a uniform buffer in any shader, or a vertex buffer
+    THSVS_ACCESS_ANY_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER,     // Read as a sampled image in any shader
     THSVS_ACCESS_ANY_SHADER_READ_OTHER,                                     // Read as any other resource (excluding attachments) in any shader
     THSVS_ACCESS_TRANSFER_READ,                                             // Read as the source of a transfer operation
     THSVS_ACCESS_HOST_READ,                                                 // Read on the host
@@ -183,25 +196,26 @@ typedef enum ThsvsAccessType {
 
 // Write access
 	// Requires VK_NVX_device_generated_commands to be enabled
-    THSVS_ACCESS_COMMAND_BUFFER_WRITE_NVX,                                  // Command buffer write operation as defined by VK_NVX_device_generated_commands
+    THSVS_ACCESS_COMMAND_BUFFER_WRITE_NVX,                                  // Command buffer write operation
 	
     THSVS_ACCESS_VERTEX_SHADER_WRITE,                                       // Written as any resource in a vertex shader
     THSVS_ACCESS_TESSELLATION_CONTROL_SHADER_WRITE,                         // Written as any resource in a tessellation control shader
     THSVS_ACCESS_TESSELLATION_EVALUATION_SHADER_WRITE,                      // Written as any resource in a tessellation evaluation shader
     THSVS_ACCESS_GEOMETRY_SHADER_WRITE,                                     // Written as any resource in a geometry shader
     THSVS_ACCESS_FRAGMENT_SHADER_WRITE,                                     // Written as any resource in a fragment shader
-    THSVS_ACCESS_COLOR_ATTACHMENT_WRITE,                                    // Written as a color attachment during rendering
-    THSVS_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE,                            // Written as a depth/stencil attachment during rendering
+    THSVS_ACCESS_COLOR_ATTACHMENT_WRITE,                                    // Written as a color attachment during rendering, or via a subpass store op
+    THSVS_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE,                            // Written as a depth/stencil attachment during rendering, or via a subpass store op
 	
 	// Requires VK_KHR_maintenance2 to be enabled
     THSVS_ACCESS_DEPTH_ATTACHMENT_WRITE_STENCIL_READ_ONLY,                  // Written as a depth aspect of a depth/stencil attachment during rendering, whilst the stencil aspect is read-only
     THSVS_ACCESS_STENCIL_ATTACHMENT_WRITE_DEPTH_READ_ONLY,                  // Written as a stencil aspect of a depth/stencil attachment during rendering, whilst the depth aspect is read-only
 	
     THSVS_ACCESS_COMPUTE_SHADER_WRITE,                                      // Written as any resource in a compute shader
-    THSVS_ACCESS_ANY_SHADER_WRITE,                                      // Written as any resource in any shader
+    THSVS_ACCESS_ANY_SHADER_WRITE,                                          // Written as any resource in any shader
     THSVS_ACCESS_TRANSFER_WRITE,                                            // Written as the destination of a transfer operation
     THSVS_ACCESS_HOST_WRITE,                                                // Written on the host
 
+    THSVS_ACCESS_COLOR_ATTACHMENT_READ_WRITE,                               // Read or written as a color attachment during rendering
 // General access
     THSVS_ACCESS_GENERAL,                                                   // Covers any access - useful for debug, generally avoid for performance reasons
 
@@ -580,6 +594,10 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
     {   VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
         VK_ACCESS_UNIFORM_READ_BIT,
         VK_IMAGE_LAYOUT_UNDEFINED},
+	// THSVS_ACCESS_ANY_SHADER_READ_UNIFORM_BUFFER_OR_VERTEX_BUFFER
+    {   VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+        VK_ACCESS_UNIFORM_READ_BIT | VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT,
+        VK_IMAGE_LAYOUT_UNDEFINED},
     // THSVS_ACCESS_ANY_SHADER_READ_SAMPLED_IMAGE
     {   VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
         VK_ACCESS_SHADER_READ_BIT,
@@ -663,6 +681,11 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
     {   VK_PIPELINE_STAGE_HOST_BIT,
         VK_ACCESS_HOST_WRITE_BIT,
         VK_IMAGE_LAYOUT_GENERAL},
+
+	// THSVS_ACCESS_COLOR_ATTACHMENT_READ_WRITE
+    {   VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+        VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+        VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL},
     // THSVS_ACCESS_GENERAL
     {   VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
 		VK_ACCESS_TYPE_MEMORY_READ_BIT | VK_ACCESS_TYPE_MEMORY_WRITE_BIT,

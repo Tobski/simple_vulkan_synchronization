@@ -20,6 +20,20 @@ will be generated in that file.
 
 ## Version
 
+alpha.3
+    
+Alpha.3 changes the following:
+	
+Uniform and vertex buffer access in one enum, matching D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER:
+ - THSVS_ACCESS_ANY_SHADER_READ_UNIFORM_BUFFER_OR_VERTEX_BUFFER
+	 
+Color read *and* write access, matching D3D12_RESOURCE_STATE_RENDER_TARGET:
+ - THSVS_ACCESS_COLOR_ATTACHMENT_READ_WRITE
+	 
+Also the "THSVS_ACCESS_\*\_SHADER_READ_SAMPLED_IMAGE" enums have been renamed to the form "THSVS_ACCESS_\*\_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER"
+
+## Version History
+
 alpha.2
 
 Alpha.2 adds four new resource states for "ANY SHADER ACCESS":
@@ -27,9 +41,7 @@ Alpha.2 adds four new resource states for "ANY SHADER ACCESS":
  - THSVS_ACCESS_ANY_SHADER_READ_SAMPLED_IMAGE
  - THSVS_ACCESS_ANY_SHADER_READ_OTHER
  - THSVS_ACCESS_ANY_SHADER_WRITE
-
-## Version History
-
+ 
 alpha.1
 
 Alpha.1 adds three new resource states:
