@@ -20,6 +20,12 @@ will be generated in that file.
 
 ## Version
 
+alpha.4
+
+Alpha.4 now correctly zeroes out the access types before trying to incrementally set bits on them (!)
+
+## Version History
+
 alpha.3
     
 Alpha.3 changes the following:
@@ -31,8 +37,6 @@ Color read *and* write access, matching D3D12_RESOURCE_STATE_RENDER_TARGET:
  - THSVS_ACCESS_COLOR_ATTACHMENT_READ_WRITE
 	 
 Also the "THSVS_ACCESS_\*\_SHADER_READ_SAMPLED_IMAGE" enums have been renamed to the form "THSVS_ACCESS_\*\_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER"
-
-## Version History
 
 alpha.2
 
