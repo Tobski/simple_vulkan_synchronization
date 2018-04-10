@@ -40,6 +40,12 @@ USAGE
 
 VERSION
 
+    alpha.4
+
+	Alpha.4 now correctly zeroes out the access types before trying to incrementally set bits on them (!)
+
+VERSION HISTORY
+
     alpha.3
     
     Alpha.3 changes the following:
@@ -51,9 +57,7 @@ VERSION
      - THSVS_ACCESS_COLOR_ATTACHMENT_READ_WRITE
 	 
 	Also the "THSVS_ACCESS_*_SHADER_READ_SAMPLED_IMAGE" enums have been renamed to the form "THSVS_ACCESS_*_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER"
-    
-VERSION HISTORY
-
+	
     alpha.2
     
     Alpha.2 adds four new resource states for "ANY SHADER ACCESS":
@@ -698,8 +702,10 @@ void thsvsGetVulkanMemoryBarrier(
     VkPipelineStageFlags*   pDstStages,
     VkMemoryBarrier*        pVkBarrier)
 {
-    pVkBarrier->sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
-    pVkBarrier->pNext = NULL;
+    pVkBarrier->sType         = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
+    pVkBarrier->pNext         = NULL;
+	pVkBarrier->srcAccessMask = 0;
+	pVkBarrier->dstAccessMask = 0;
 
     for (int i = 0; i < thBarrier.prevAccessCount; ++i)
     {
@@ -738,6 +744,8 @@ void thsvsGetVulkanBufferMemoryBarrier(
 {
     pVkBarrier->sType               = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
     pVkBarrier->pNext               = NULL;
+	pVkBarrier->srcAccessMask       = 0;
+	pVkBarrier->dstAccessMask       = 0;
     pVkBarrier->srcQueueFamilyIndex = thBarrier.srcQueueFamilyIndex;
     pVkBarrier->dstQueueFamilyIndex = thBarrier.dstQueueFamilyIndex;
     pVkBarrier->buffer              = thBarrier.buffer;
@@ -782,6 +790,8 @@ void thsvsGetVulkanImageMemoryBarrier(
 {
     pVkBarrier->sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     pVkBarrier->pNext               = NULL;
+	pVkBarrier->srcAccessMask       = 0;
+	pVkBarrier->dstAccessMask       = 0;
     pVkBarrier->srcQueueFamilyIndex = thBarrier.srcQueueFamilyIndex;
     pVkBarrier->dstQueueFamilyIndex = thBarrier.dstQueueFamilyIndex;
     pVkBarrier->image               = thBarrier.image;
