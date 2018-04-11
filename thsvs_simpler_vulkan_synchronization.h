@@ -811,6 +811,7 @@ void thsvsGetVulkanImageMemoryBarrier(
         const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
+        assert(prevAccess < THSVS_NUM_ACCESS_TYPES); // Make sure the lookup is in range
         // Asserts that the access is a read, else it's a write and it should appear on its own.
         assert(prevAccess <= THSVS_ACCESS_PRESENT || thBarrier.prevAccessCount == 1);
 #endif
@@ -862,6 +863,7 @@ void thsvsGetVulkanImageMemoryBarrier(
         const ThsvsVkAccessInfo* pNextAccessInfo = &ThsvsAccessMap[nextAccess];
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
+        assert(nextAccess < THSVS_NUM_ACCESS_TYPES); // Make sure the lookup is in range
         // Asserts that the access is a read, else it's a write and it should appear on its own.
         assert(nextAccess <= THSVS_ACCESS_PRESENT || thBarrier.nextAccessCount == 1);
 #endif
