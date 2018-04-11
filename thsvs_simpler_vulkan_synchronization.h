@@ -40,11 +40,15 @@ USAGE
 
 VERSION
 
+    alpha.6
+
+    Alpha.6 fixes a typo (VK_ACCESS_TYPE_MEMORY_READ|WRITE_BIT should have been VK_ACCESS_MEMORY_READ|WRITE_BIT), and sets the pipeline stage src and dst flag bits to VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT and VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT during initialization, not 0 as per alpha.5
+
+VERSION HISTORY
+
     alpha.5
 
     Alpha.5 now correctly zeroes out the pipeline stage flags before trying to incrementally set bits on them... common theme here, whoops.
-
-VERSION HISTORY
 
     alpha.4
 
@@ -696,7 +700,7 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
         VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL},
     // THSVS_ACCESS_GENERAL
     {   VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-        VK_ACCESS_TYPE_MEMORY_READ_BIT | VK_ACCESS_TYPE_MEMORY_WRITE_BIT,
+        VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_MEMORY_WRITE_BIT,
         VK_IMAGE_LAYOUT_GENERAL}
 };
 
@@ -706,8 +710,8 @@ void thsvsGetVulkanMemoryBarrier(
     VkPipelineStageFlags*   pDstStages,
     VkMemoryBarrier*        pVkBarrier)
 {
-    *pSrcStages               = 0;
-    *pDstStages               = 0;
+    *pSrcStages               = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+    *pDstStages               = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
     pVkBarrier->sType         = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
     pVkBarrier->pNext         = NULL;
     pVkBarrier->srcAccessMask = 0;
@@ -748,8 +752,8 @@ void thsvsGetVulkanBufferMemoryBarrier(
     VkPipelineStageFlags*   pDstStages,
     VkBufferMemoryBarrier*  pVkBarrier)
 {
-    *pSrcStages                     = 0;
-    *pDstStages                     = 0;
+    *pSrcStages                     = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+    *pDstStages                     = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
     pVkBarrier->sType               = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
     pVkBarrier->pNext               = NULL;
     pVkBarrier->srcAccessMask       = 0;
@@ -796,8 +800,8 @@ void thsvsGetVulkanImageMemoryBarrier(
     VkPipelineStageFlags*   pDstStages,
     VkImageMemoryBarrier*   pVkBarrier)
 {
-    *pSrcStages                     = 0;
-    *pDstStages                     = 0;
+    *pSrcStages                     = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+    *pDstStages                     = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
     pVkBarrier->sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     pVkBarrier->pNext               = NULL;
     pVkBarrier->srcAccessMask       = 0;
