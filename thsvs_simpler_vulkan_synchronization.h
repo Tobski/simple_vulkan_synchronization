@@ -40,11 +40,17 @@ USAGE
 
 VERSION
 
+    alpha.7
+
+    Alpha.7 incorporates a number of fixes from @gwihlidal, and fixes
+    handling of pipeline stages in the presence of multiple access types or
+    barriers in light of other recent changes.
+
+VERSION HISTORY
+
     alpha.6
 
     Alpha.6 fixes a typo (VK_ACCESS_TYPE_MEMORY_READ|WRITE_BIT should have been VK_ACCESS_MEMORY_READ|WRITE_BIT), and sets the pipeline stage src and dst flag bits to VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT and VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT during initialization, not 0 as per alpha.5
-
-VERSION HISTORY
 
     alpha.5
 
@@ -723,11 +729,12 @@ void thsvsGetVulkanMemoryBarrier(
     for (int i = 0; i < thBarrier.prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = thBarrier.pPrevAccesses[i];
+        const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
+
 #ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
         // Asserts that the previous access index is a valid range for the lookup
         assert(prevAccess < THSVS_NUM_ACCESS_TYPES);
 #endif
-        const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
         // Asserts that the access is a read, else it's a write and it should appear on its own.
@@ -742,11 +749,12 @@ void thsvsGetVulkanMemoryBarrier(
     for (int i = 0; i < thBarrier.nextAccessCount; ++i)
     {
         ThsvsAccessType nextAccess = thBarrier.pNextAccesses[i];
+        const ThsvsVkAccessInfo* pNextAccessInfo = &ThsvsAccessMap[nextAccess];
+
 #ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
         // Asserts that the next access index is a valid range for the lookup
         assert(nextAccess < THSVS_NUM_ACCESS_TYPES);
 #endif
-        const ThsvsVkAccessInfo* pNextAccessInfo = &ThsvsAccessMap[nextAccess];
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
         // Asserts that the access is a read, else it's a write and it should appear on its own.
@@ -778,11 +786,12 @@ void thsvsGetVulkanBufferMemoryBarrier(
     for (int i = 0; i < thBarrier.prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = thBarrier.pPrevAccesses[i];
+        const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
+
 #ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
         // Asserts that the previous access index is a valid range for the lookup
         assert(prevAccess < THSVS_NUM_ACCESS_TYPES);
 #endif
-        const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
         // Asserts that the access is a read, else it's a write and it should appear on its own.
@@ -797,11 +806,12 @@ void thsvsGetVulkanBufferMemoryBarrier(
     for (int i = 0; i < thBarrier.nextAccessCount; ++i)
     {
         ThsvsAccessType nextAccess = thBarrier.pNextAccesses[i];
+        const ThsvsVkAccessInfo* pNextAccessInfo = &ThsvsAccessMap[nextAccess];
+
 #ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
         // Asserts that the next access index is a valid range for the lookup
         assert(nextAccess < THSVS_NUM_ACCESS_TYPES);
 #endif
-        const ThsvsVkAccessInfo* pNextAccessInfo = &ThsvsAccessMap[nextAccess];
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
         // Asserts that the access is a read, else it's a write and it should appear on its own.
@@ -835,11 +845,12 @@ void thsvsGetVulkanImageMemoryBarrier(
     for (int i = 0; i < thBarrier.prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = thBarrier.pPrevAccesses[i];
+        const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
+
 #ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
         // Asserts that the previous access index is a valid range for the lookup
         assert(prevAccess < THSVS_NUM_ACCESS_TYPES);
 #endif
-        const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
         // Asserts that the access is a read, else it's a write and it should appear on its own.
@@ -874,7 +885,7 @@ void thsvsGetVulkanImageMemoryBarrier(
                     break;
             }
 
-            
+
 #ifdef THSVS_ERROR_CHECK_MIXED_IMAGE_LAYOUT
             assert(pVkBarrier->oldLayout == VK_IMAGE_LAYOUT_UNDEFINED ||
                    pVkBarrier->oldLayout == layout);
@@ -890,11 +901,12 @@ void thsvsGetVulkanImageMemoryBarrier(
     for (int i = 0; i < thBarrier.nextAccessCount; ++i)
     {
         ThsvsAccessType nextAccess = thBarrier.pNextAccesses[i];
+        const ThsvsVkAccessInfo* pNextAccessInfo = &ThsvsAccessMap[nextAccess];
+
 #ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
         // Asserts that the next access index is a valid range for the lookup
         assert(nextAccess < THSVS_NUM_ACCESS_TYPES);
 #endif
-        const ThsvsVkAccessInfo* pNextAccessInfo = &ThsvsAccessMap[nextAccess];
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
         // Asserts that the access is a read, else it's a write and it should appear on its own.
@@ -957,7 +969,11 @@ void thsvsCmdPipelineBarrier(
     // Global memory barrier
     if (pGlobalBarrier != NULL)
     {
-        thsvsGetVulkanMemoryBarrier(*pGlobalBarrier, &srcStageMask, &dstStageMask, pMemoryBarriers);
+        VkPipelineStageFlags tempSrcStageMask = 0;
+        VkPipelineStageFlags tempDstStageMask = 0;
+        thsvsGetVulkanMemoryBarrier(*pGlobalBarrier, &tempSrcStageMask, &tempDstStageMask, pMemoryBarriers);
+        srcStageMask |= tempSrcStageMask;
+        dstStageMask |= tempDstStageMask;
     }
 
     // Buffer memory barriers
@@ -965,9 +981,13 @@ void thsvsCmdPipelineBarrier(
     {
         pBufferMemoryBarriers = (VkBufferMemoryBarrier*)temp_alloc(sizeof(VkBufferMemoryBarrier) * bufferMemoryBarrierCount);
 
+        VkPipelineStageFlags tempSrcStageMask = 0;
+        VkPipelineStageFlags tempDstStageMask = 0;
         for (int i = 0; i < bufferBarrierCount; ++i)
         {
-            thsvsGetVulkanBufferMemoryBarrier(pBufferBarriers[i], &srcStageMask, &dstStageMask, &pBufferMemoryBarriers[i]);
+            thsvsGetVulkanBufferMemoryBarrier(pBufferBarriers[i], &tempSrcStageMask, &tempDstStageMask, &pBufferMemoryBarriers[i]);
+            srcStageMask |= tempSrcStageMask;
+            dstStageMask |= tempDstStageMask;
         }
     }
 
@@ -976,9 +996,13 @@ void thsvsCmdPipelineBarrier(
     {
         pImageMemoryBarriers = (VkImageMemoryBarrier*)temp_alloc(sizeof(VkImageMemoryBarrier) * imageMemoryBarrierCount);
 
+        VkPipelineStageFlags tempSrcStageMask = 0;
+        VkPipelineStageFlags tempDstStageMask = 0;
         for (int i = 0; i < imageBarrierCount; ++i)
         {
-            thsvsGetVulkanImageMemoryBarrier(pImageBarriers[i], &srcStageMask, &dstStageMask, &pImageMemoryBarriers[i]);
+            thsvsGetVulkanImageMemoryBarrier(pImageBarriers[i], &tempSrcStageMask, &tempDstStageMask, &pImageMemoryBarriers[i]);
+            srcStageMask |= tempSrcStageMask;
+            dstStageMask |= tempDstStageMask;
         }
     }
 
@@ -1009,11 +1033,12 @@ void thsvsCmdSetEvent(
     for (int i = 0; i < prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = pPrevAccesses[i];
+        const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
+
 #ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
         // Asserts that the previous access index is a valid range for the lookup
         assert(prevAccess < THSVS_NUM_ACCESS_TYPES);
 #endif
-        const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
 
         stageMask |= pPrevAccessInfo->stageMask;
     }
@@ -1035,11 +1060,12 @@ void thsvsCmdResetEvent(
     for (int i = 0; i < prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = pPrevAccesses[i];
+        const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
+
 #ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
         // Asserts that the previous access index is a valid range for the lookup
         assert(prevAccess < THSVS_NUM_ACCESS_TYPES);
 #endif
-        const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
 
         stageMask |= pPrevAccessInfo->stageMask;
     }
@@ -1077,7 +1103,11 @@ void thsvsCmdWaitEvents(
     // Global memory barrier
     if (pGlobalBarrier != NULL)
     {
-        thsvsGetVulkanMemoryBarrier(*pGlobalBarrier, &srcStageMask, &dstStageMask, pMemoryBarriers);
+        VkPipelineStageFlags tempSrcStageMask = 0;
+        VkPipelineStageFlags tempDstStageMask = 0;
+        thsvsGetVulkanMemoryBarrier(*pGlobalBarrier, &tempSrcStageMask, &tempDstStageMask, pMemoryBarriers);
+        srcStageMask |= tempSrcStageMask;
+        dstStageMask |= tempDstStageMask;
     }
 
     // Buffer memory barriers
@@ -1085,9 +1115,13 @@ void thsvsCmdWaitEvents(
     {
         pBufferMemoryBarriers = (VkBufferMemoryBarrier*)temp_alloc(sizeof(VkBufferMemoryBarrier) * bufferMemoryBarrierCount);
 
+        VkPipelineStageFlags tempSrcStageMask = 0;
+        VkPipelineStageFlags tempDstStageMask = 0;
         for (int i = 0; i < bufferBarrierCount; ++i)
         {
-            thsvsGetVulkanBufferMemoryBarrier(pBufferBarriers[i], &srcStageMask, &dstStageMask, &pBufferMemoryBarriers[i]);
+            thsvsGetVulkanBufferMemoryBarrier(pBufferBarriers[i], &tempSrcStageMask, &tempDstStageMask, &pBufferMemoryBarriers[i]);
+            srcStageMask |= tempSrcStageMask;
+            dstStageMask |= tempDstStageMask;
         }
     }
 
@@ -1096,9 +1130,13 @@ void thsvsCmdWaitEvents(
     {
         pImageMemoryBarriers = (VkImageMemoryBarrier*)temp_alloc(sizeof(VkImageMemoryBarrier) * imageMemoryBarrierCount);
 
+        VkPipelineStageFlags tempSrcStageMask = 0;
+        VkPipelineStageFlags tempDstStageMask = 0;
         for (int i = 0; i < imageBarrierCount; ++i)
         {
-            thsvsGetVulkanImageMemoryBarrier(pImageBarriers[i], &srcStageMask, &dstStageMask, &pImageMemoryBarriers[i]);
+            thsvsGetVulkanImageMemoryBarrier(pImageBarriers[i], &tempSrcStageMask, &tempDstStageMask, &pImageMemoryBarriers[i]);
+            srcStageMask |= tempSrcStageMask;
+            dstStageMask |= tempDstStageMask;
         }
     }
 
