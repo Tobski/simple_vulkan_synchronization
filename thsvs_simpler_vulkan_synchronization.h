@@ -157,7 +157,6 @@ ISSUES
 #define THSVS_SIMPLER_VULKAN_SYNCHRONIZATION_H 1
 
 #include <stdint.h>
-#include "vulkan.h"
 
 /*
 ThsvsAccessType defines all potential resource usages in the Vulkan API.
