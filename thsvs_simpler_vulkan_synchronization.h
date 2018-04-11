@@ -852,7 +852,7 @@ void thsvsGetVulkanImageMemoryBarrier(
         }
 
 #ifdef THSVS_ERROR_CHECK_COULD_USE_GLOBAL_BARRIER
-    assert(pVkBarrier.srcQueueFamilyIndex != pVkBarrier.dstQueueFamilyIndex);
+    assert(pVkBarrier->srcQueueFamilyIndex != pVkBarrier->dstQueueFamilyIndex);
 #endif
     }
 
@@ -895,8 +895,8 @@ void thsvsGetVulkanImageMemoryBarrier(
     }
 
 #ifdef THSVS_ERROR_CHECK_COULD_USE_GLOBAL_BARRIER
-    assert(pVkBarrier.newLayout != pVkBarrier.oldLayout ||
-           pVkBarrier.srcQueueFamilyIndex != pVkBarrier.dstQueueFamilyIndex);
+    assert(pVkBarrier->newLayout != pVkBarrier->oldLayout ||
+           pVkBarrier->srcQueueFamilyIndex != pVkBarrier->dstQueueFamilyIndex);
 #endif
 }
 
