@@ -20,6 +20,16 @@ will be generated in that file.
 
 ## Version
 
+alpha.5
+
+Alpha.5 now correctly zeroes out the pipeline stage flags before trying to incrementally set bits on them... common theme here, whoops.
+
+## Version History
+
+alpha.4
+
+Alpha.4 now correctly zeroes out the access types before trying to incrementally set bits on them (!)
+
 alpha.3
     
 Alpha.3 changes the following:
@@ -31,8 +41,6 @@ Color read *and* write access, matching D3D12_RESOURCE_STATE_RENDER_TARGET:
  - THSVS_ACCESS_COLOR_ATTACHMENT_READ_WRITE
 	 
 Also the "THSVS_ACCESS_\*\_SHADER_READ_SAMPLED_IMAGE" enums have been renamed to the form "THSVS_ACCESS_\*\_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER"
-
-## Version History
 
 alpha.2
 
