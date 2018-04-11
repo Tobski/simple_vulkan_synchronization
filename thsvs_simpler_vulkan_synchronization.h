@@ -24,12 +24,12 @@ In an effort to make Vulkan synchronization more accessible, I created this
 stb-inspired single-header library in order to somewhat simplify the core
 synchronization mechanisms in Vulkan - pipeline barriers and events.
 
-Rather than the complex maze of enums and bitflags in Vulkan - many
+Rather than the complex maze of enums and bit flags in Vulkan - many
 combinations of which are invalid or nonsensical - this library collapses
 this to a much shorter list of 40 distinct usage types, and a couple of
 options for handling image layouts.
 
-Use of other synchonization mechanisms such as semaphores, fences and render
+Use of other synchronization mechanisms such as semaphores, fences and render
 passes are not addressed in this API at present.
 
 USAGE
@@ -90,7 +90,7 @@ VERSION HISTORY
     received.
     Once the version becomes stable, incompatible changes will only be made
     to major revisions of the API - minor revisions will only contain
-    bugfixes or minor additions.
+    bug fixes or minor additions.
 
 MEMORY ALLOCATION
 
@@ -112,7 +112,7 @@ EXPRESSIVENESS COMPARED TO RAW VULKAN
     Despite the fact that this API is fairly simple, it expresses 99% of
     what you'd actually ever want to do in practice.
     Adding the missing expressiveness would result in increased complexity
-    which didn't seem worth the tradeoff - however I would consider adding
+    which didn't seem worth the trade off - however I would consider adding
     something for them in future if it becomes an issue.
 
     Here's a list of known things you can't express:
@@ -161,13 +161,12 @@ ISSUES
 #define THSVS_SIMPLER_VULKAN_SYNCHRONIZATION_H 1
 
 #include <stdint.h>
-#include "vulkan.h"
 
 /*
 ThsvsAccessType defines all potential resource usages in the Vulkan API.
 */
 typedef enum ThsvsAccessType {
-    THSVS_ACCESS_NONE,                                                      // No access. Useful primarily for intialisation
+    THSVS_ACCESS_NONE,                                                      // No access. Useful primarily for initialization
 
 // Read access
     // Requires VK_NVX_device_generated_commands to be enabled
@@ -245,7 +244,7 @@ typedef enum ThsvsImageLayout {
     THSVS_IMAGE_LAYOUT_OPTIMAL,                 // Choose the most optimal layout for each usage. Performs layout transitions as appropriate for the access.
     THSVS_IMAGE_LAYOUT_GENERAL,                 // Layout accessible by all Vulkan access types on a device - no layout transitions except for presentation
 
-    // Requires VK_KHR_shared_presentable_image to be enabled. Can only be used for shared presentable images (i.e. single-buffered swapchains).
+    // Requires VK_KHR_shared_presentable_image to be enabled. Can only be used for shared presentable images (i.e. single-buffered swap chains).
     THSVS_IMAGE_LAYOUT_GENERAL_AND_PRESENTATION // As GENERAL, but also allows presentation engines to access it - no layout transitions
 } ThsvsImageLayout;
 
@@ -371,7 +370,6 @@ barrier definitions into a set of pipeline stages and native Vulkan memory
 barriers to be passed to vkCmdPipelineBarrier.
 
 commandBuffer is passed unmodified to vkCmdPipelineBarrier.
-
 */
 void thsvsCmdPipelineBarrier(
     VkCommandBuffer           commandBuffer,
@@ -447,11 +445,16 @@ Checks if an image/buffer barrier is used when a global barrier would suffice
 /*
 Checks if a write access is listed alongside any other access - if so it
 points to a potential data hazard that you need to synchronize separately.
-In some cases it may simply be over-synchonization however, but it's usually
+In some cases it may simply be over-synchronization however, but it's usually
 worth checking.
 */
 // #define THSVS_ERROR_CHECK_POTENTIAL_HAZARD
 
+/*
+Checks if a variety of table lookups (like the access map) are within
+a valid range.
+*/
+// #define THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
 
 //// Temporary Memory Allocation ////
 /*
@@ -720,6 +723,10 @@ void thsvsGetVulkanMemoryBarrier(
     for (int i = 0; i < thBarrier.prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = thBarrier.pPrevAccesses[i];
+#ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
+        // Asserts that the previous access index is a valid range for the lookup
+        assert(prevAccess < THSVS_NUM_ACCESS_TYPES);
+#endif
         const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
@@ -735,6 +742,10 @@ void thsvsGetVulkanMemoryBarrier(
     for (int i = 0; i < thBarrier.nextAccessCount; ++i)
     {
         ThsvsAccessType nextAccess = thBarrier.pNextAccesses[i];
+#ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
+        // Asserts that the next access index is a valid range for the lookup
+        assert(nextAccess < THSVS_NUM_ACCESS_TYPES);
+#endif
         const ThsvsVkAccessInfo* pNextAccessInfo = &ThsvsAccessMap[nextAccess];
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
@@ -767,6 +778,10 @@ void thsvsGetVulkanBufferMemoryBarrier(
     for (int i = 0; i < thBarrier.prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = thBarrier.pPrevAccesses[i];
+#ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
+        // Asserts that the previous access index is a valid range for the lookup
+        assert(prevAccess < THSVS_NUM_ACCESS_TYPES);
+#endif
         const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
@@ -782,6 +797,10 @@ void thsvsGetVulkanBufferMemoryBarrier(
     for (int i = 0; i < thBarrier.nextAccessCount; ++i)
     {
         ThsvsAccessType nextAccess = thBarrier.pNextAccesses[i];
+#ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
+        // Asserts that the next access index is a valid range for the lookup
+        assert(nextAccess < THSVS_NUM_ACCESS_TYPES);
+#endif
         const ThsvsVkAccessInfo* pNextAccessInfo = &ThsvsAccessMap[nextAccess];
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
@@ -810,10 +829,16 @@ void thsvsGetVulkanImageMemoryBarrier(
     pVkBarrier->dstQueueFamilyIndex = thBarrier.dstQueueFamilyIndex;
     pVkBarrier->image               = thBarrier.image;
     pVkBarrier->subresourceRange    = thBarrier.subresourceRange;
+    pVkBarrier->oldLayout           = VK_IMAGE_LAYOUT_UNDEFINED;
+    pVkBarrier->newLayout           = VK_IMAGE_LAYOUT_UNDEFINED;
 
     for (int i = 0; i < thBarrier.prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = thBarrier.pPrevAccesses[i];
+#ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
+        // Asserts that the previous access index is a valid range for the lookup
+        assert(prevAccess < THSVS_NUM_ACCESS_TYPES);
+#endif
         const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
@@ -849,6 +874,7 @@ void thsvsGetVulkanImageMemoryBarrier(
                     break;
             }
 
+            
 #ifdef THSVS_ERROR_CHECK_MIXED_IMAGE_LAYOUT
             assert(pVkBarrier->oldLayout == VK_IMAGE_LAYOUT_UNDEFINED ||
                    pVkBarrier->oldLayout == layout);
@@ -857,14 +883,17 @@ void thsvsGetVulkanImageMemoryBarrier(
         }
 
 #ifdef THSVS_ERROR_CHECK_COULD_USE_GLOBAL_BARRIER
-    assert(pVkBarrier.srcQueueFamilyIndex != pVkBarrier.dstQueueFamilyIndex);
+    assert(pVkBarrier->srcQueueFamilyIndex != pVkBarrier->dstQueueFamilyIndex);
 #endif
     }
 
     for (int i = 0; i < thBarrier.nextAccessCount; ++i)
     {
         ThsvsAccessType nextAccess = thBarrier.pNextAccesses[i];
-        VkImageLayout layout;
+#ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
+        // Asserts that the next access index is a valid range for the lookup
+        assert(nextAccess < THSVS_NUM_ACCESS_TYPES);
+#endif
         const ThsvsVkAccessInfo* pNextAccessInfo = &ThsvsAccessMap[nextAccess];
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
@@ -875,6 +904,7 @@ void thsvsGetVulkanImageMemoryBarrier(
         *pDstStages |= pNextAccessInfo->stageMask;
         pVkBarrier->dstAccessMask |= pNextAccessInfo->accessMask;
 
+        VkImageLayout layout;
         switch(thBarrier.nextLayout)
         {
             case THSVS_IMAGE_LAYOUT_GENERAL:
@@ -899,8 +929,8 @@ void thsvsGetVulkanImageMemoryBarrier(
     }
 
 #ifdef THSVS_ERROR_CHECK_COULD_USE_GLOBAL_BARRIER
-    assert(pVkBarrier.newLayout != pVkBarrier.oldLayout ||
-           pVkBarrier.srcQueueFamilyIndex != pVkBarrier.dstQueueFamilyIndex);
+    assert(pVkBarrier->newLayout != pVkBarrier->oldLayout ||
+           pVkBarrier->srcQueueFamilyIndex != pVkBarrier->dstQueueFamilyIndex);
 #endif
 }
 
@@ -979,6 +1009,10 @@ void thsvsCmdSetEvent(
     for (int i = 0; i < prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = pPrevAccesses[i];
+#ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
+        // Asserts that the previous access index is a valid range for the lookup
+        assert(prevAccess < THSVS_NUM_ACCESS_TYPES);
+#endif
         const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
 
         stageMask |= pPrevAccessInfo->stageMask;
@@ -1001,6 +1035,10 @@ void thsvsCmdResetEvent(
     for (int i = 0; i < prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = pPrevAccesses[i];
+#ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
+        // Asserts that the previous access index is a valid range for the lookup
+        assert(prevAccess < THSVS_NUM_ACCESS_TYPES);
+#endif
         const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
 
         stageMask |= pPrevAccessInfo->stageMask;
