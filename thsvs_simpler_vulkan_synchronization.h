@@ -844,11 +844,11 @@ void thsvsGetVulkanImageMemoryBarrier(
                     break;
             }
 
+            pVkBarrier->oldLayout = layout;
 #ifdef THSVS_ERROR_CHECK_MIXED_IMAGE_LAYOUT
             assert(pVkBarrier->oldLayout == VK_IMAGE_LAYOUT_UNDEFINED ||
                    pVkBarrier->oldLayout == layout);
 #endif
-            pVkBarrier->oldLayout = layout;
         }
 
 #ifdef THSVS_ERROR_CHECK_COULD_USE_GLOBAL_BARRIER
@@ -887,11 +887,11 @@ void thsvsGetVulkanImageMemoryBarrier(
                 break;
         }
 
+        pVkBarrier->newLayout = layout;
 #ifdef THSVS_ERROR_CHECK_MIXED_IMAGE_LAYOUT
         assert(pVkBarrier->newLayout == VK_IMAGE_LAYOUT_UNDEFINED ||
                pVkBarrier->newLayout == layout);
 #endif
-        pVkBarrier->newLayout = layout;
     }
 
 #ifdef THSVS_ERROR_CHECK_COULD_USE_GLOBAL_BARRIER
