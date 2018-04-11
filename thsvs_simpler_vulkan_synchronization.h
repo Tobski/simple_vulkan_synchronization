@@ -450,6 +450,11 @@ worth checking.
 */
 // #define THSVS_ERROR_CHECK_POTENTIAL_HAZARD
 
+/*
+Checks if a variety of table lookups (like the access map) are within
+a valid range.
+*/
+// #define THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
 
 //// Temporary Memory Allocation ////
 /*
@@ -718,6 +723,10 @@ void thsvsGetVulkanMemoryBarrier(
     for (int i = 0; i < thBarrier.prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = thBarrier.pPrevAccesses[i];
+#ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
+        // Asserts that the previous access index is a valid range for the lookup
+        assert(prevAccess < THSVS_NUM_ACCESS_TYPES);
+#endif
         const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
@@ -733,6 +742,10 @@ void thsvsGetVulkanMemoryBarrier(
     for (int i = 0; i < thBarrier.nextAccessCount; ++i)
     {
         ThsvsAccessType nextAccess = thBarrier.pNextAccesses[i];
+#ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
+        // Asserts that the next access index is a valid range for the lookup
+        assert(nextAccess < THSVS_NUM_ACCESS_TYPES);
+#endif
         const ThsvsVkAccessInfo* pNextAccessInfo = &ThsvsAccessMap[nextAccess];
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
@@ -765,6 +778,10 @@ void thsvsGetVulkanBufferMemoryBarrier(
     for (int i = 0; i < thBarrier.prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = thBarrier.pPrevAccesses[i];
+#ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
+        // Asserts that the previous access index is a valid range for the lookup
+        assert(prevAccess < THSVS_NUM_ACCESS_TYPES);
+#endif
         const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
@@ -780,6 +797,10 @@ void thsvsGetVulkanBufferMemoryBarrier(
     for (int i = 0; i < thBarrier.nextAccessCount; ++i)
     {
         ThsvsAccessType nextAccess = thBarrier.pNextAccesses[i];
+#ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
+        // Asserts that the next access index is a valid range for the lookup
+        assert(nextAccess < THSVS_NUM_ACCESS_TYPES);
+#endif
         const ThsvsVkAccessInfo* pNextAccessInfo = &ThsvsAccessMap[nextAccess];
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
@@ -812,10 +833,13 @@ void thsvsGetVulkanImageMemoryBarrier(
     for (int i = 0; i < thBarrier.prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = thBarrier.pPrevAccesses[i];
+#ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
+        // Asserts that the previous access index is a valid range for the lookup
+        assert(prevAccess < THSVS_NUM_ACCESS_TYPES);
+#endif
         const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
-        assert(prevAccess < THSVS_NUM_ACCESS_TYPES); // Make sure the lookup is in range
         // Asserts that the access is a read, else it's a write and it should appear on its own.
         assert(prevAccess <= THSVS_ACCESS_PRESENT || thBarrier.prevAccessCount == 1);
 #endif
@@ -863,11 +887,13 @@ void thsvsGetVulkanImageMemoryBarrier(
     for (int i = 0; i < thBarrier.nextAccessCount; ++i)
     {
         ThsvsAccessType nextAccess = thBarrier.pNextAccesses[i];
-        VkImageLayout layout;
+#ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
+        // Asserts that the next access index is a valid range for the lookup
+        assert(nextAccess < THSVS_NUM_ACCESS_TYPES);
+#endif
         const ThsvsVkAccessInfo* pNextAccessInfo = &ThsvsAccessMap[nextAccess];
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
-        assert(nextAccess < THSVS_NUM_ACCESS_TYPES); // Make sure the lookup is in range
         // Asserts that the access is a read, else it's a write and it should appear on its own.
         assert(nextAccess <= THSVS_ACCESS_PRESENT || thBarrier.nextAccessCount == 1);
 #endif
@@ -875,6 +901,7 @@ void thsvsGetVulkanImageMemoryBarrier(
         *pDstStages |= pNextAccessInfo->stageMask;
         pVkBarrier->dstAccessMask |= pNextAccessInfo->accessMask;
 
+        VkImageLayout layout;
         switch(thBarrier.nextLayout)
         {
             case THSVS_IMAGE_LAYOUT_GENERAL:
@@ -979,6 +1006,10 @@ void thsvsCmdSetEvent(
     for (int i = 0; i < prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = pPrevAccesses[i];
+#ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
+        // Asserts that the previous access index is a valid range for the lookup
+        assert(prevAccess < THSVS_NUM_ACCESS_TYPES);
+#endif
         const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
 
         stageMask |= pPrevAccessInfo->stageMask;
@@ -1001,6 +1032,10 @@ void thsvsCmdResetEvent(
     for (int i = 0; i < prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = pPrevAccesses[i];
+#ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
+        // Asserts that the previous access index is a valid range for the lookup
+        assert(prevAccess < THSVS_NUM_ACCESS_TYPES);
+#endif
         const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
 
         stageMask |= pPrevAccessInfo->stageMask;
