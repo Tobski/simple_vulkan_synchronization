@@ -20,11 +20,17 @@ will be generated in that file.
 
 ## Version
 
+alpha.7
+
+Alpha.7 incorporates a number of fixes from @gwihlidal, and fixes
+handling of pipeline stages in the presence of multiple access types or
+barriers in light of other recent changes.
+
+## Version History
+
 alpha.6
 
 Alpha.6 fixes a typo (VK_ACCESS_TYPE_MEMORY_READ|WRITE_BIT should have been VK_ACCESS_MEMORY_READ|WRITE_BIT), and sets the pipeline stage src and dst flag bits to VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT and VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT during initialization, not 0 as per alpha.5
-
-## Version History
 
 alpha.5
 
