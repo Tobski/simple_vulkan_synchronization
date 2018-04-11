@@ -40,26 +40,30 @@ USAGE
 
 VERSION
 
-    alpha.4
+    alpha.5
 
-	Alpha.4 now correctly zeroes out the access types before trying to incrementally set bits on them (!)
+    Alpha.5 now correctly zeroes out the pipeline stage flags before trying to incrementally set bits on them... common theme here, whoops.
 
 VERSION HISTORY
 
+    alpha.4
+
+    Alpha.4 now correctly zeroes out the access types before trying to incrementally set bits on them (!)
+
     alpha.3
-    
+
     Alpha.3 changes the following:
-	
-	Uniform and vertex buffer access in one enum, matching D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER:
-	 - THSVS_ACCESS_ANY_SHADER_READ_UNIFORM_BUFFER_OR_VERTEX_BUFFER
-	 
-	Color read *and* write access, matching D3D12_RESOURCE_STATE_RENDER_TARGET:
+
+    Uniform and vertex buffer access in one enum, matching D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER:
+     - THSVS_ACCESS_ANY_SHADER_READ_UNIFORM_BUFFER_OR_VERTEX_BUFFER
+
+    Color read *and* write access, matching D3D12_RESOURCE_STATE_RENDER_TARGET:
      - THSVS_ACCESS_COLOR_ATTACHMENT_READ_WRITE
-	 
-	Also the "THSVS_ACCESS_*_SHADER_READ_SAMPLED_IMAGE" enums have been renamed to the form "THSVS_ACCESS_*_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER"
-	
+
+    Also the "THSVS_ACCESS_*_SHADER_READ_SAMPLED_IMAGE" enums have been renamed to the form "THSVS_ACCESS_*_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER"
+
     alpha.2
-    
+
     Alpha.2 adds four new resource states for "ANY SHADER ACCESS":
      - THSVS_ACCESS_ANY_SHADER_READ_UNIFORM_BUFFER
      - THSVS_ACCESS_ANY_SHADER_READ_SAMPLED_IMAGE
@@ -67,12 +71,12 @@ VERSION HISTORY
      - THSVS_ACCESS_ANY_SHADER_WRITE
 
     alpha.1
-    
+
     Alpha.1 adds three new resource states:
      - THSVS_ACCESS_GENERAL (Any access on the device)
      - THSVS_ACCESS_DEPTH_ATTACHMENT_WRITE_STENCIL_READ_ONLY (Write access to only the depth aspect of a depth/stencil attachment)
      - THSVS_ACCESS_STENCIL_ATTACHMENT_WRITE_DEPTH_READ_ONLY (Write access to only the stencil aspect of a depth/stencil attachment)
-     
+
     It also fixes a couple of typos, and adds clarification as to when extensions need to be enabled to use a feature.
 
     alpha.0
@@ -162,9 +166,9 @@ typedef enum ThsvsAccessType {
     THSVS_ACCESS_NONE,                                                      // No access. Useful primarily for intialisation
 
 // Read access
-	// Requires VK_NVX_device_generated_commands to be enabled
+    // Requires VK_NVX_device_generated_commands to be enabled
     THSVS_ACCESS_COMMAND_BUFFER_READ_NVX,                                   // Command buffer read operation as defined by NVX_device_generated_commands
-	
+
     THSVS_ACCESS_INDIRECT_BUFFER,                                           // Read as an indirect buffer for drawing or dispatch
     THSVS_ACCESS_INDEX_BUFFER,                                              // Read as an index buffer for drawing
     THSVS_ACCESS_VERTEX_BUFFER,                                             // Read as a vertex buffer for drawing
@@ -199,9 +203,9 @@ typedef enum ThsvsAccessType {
     THSVS_ACCESS_PRESENT,                                                   // Read by the presentation engine (i.e. vkQueuePresentKHR)
 
 // Write access
-	// Requires VK_NVX_device_generated_commands to be enabled
+    // Requires VK_NVX_device_generated_commands to be enabled
     THSVS_ACCESS_COMMAND_BUFFER_WRITE_NVX,                                  // Command buffer write operation
-	
+
     THSVS_ACCESS_VERTEX_SHADER_WRITE,                                       // Written as any resource in a vertex shader
     THSVS_ACCESS_TESSELLATION_CONTROL_SHADER_WRITE,                         // Written as any resource in a tessellation control shader
     THSVS_ACCESS_TESSELLATION_EVALUATION_SHADER_WRITE,                      // Written as any resource in a tessellation evaluation shader
@@ -209,11 +213,11 @@ typedef enum ThsvsAccessType {
     THSVS_ACCESS_FRAGMENT_SHADER_WRITE,                                     // Written as any resource in a fragment shader
     THSVS_ACCESS_COLOR_ATTACHMENT_WRITE,                                    // Written as a color attachment during rendering, or via a subpass store op
     THSVS_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE,                            // Written as a depth/stencil attachment during rendering, or via a subpass store op
-	
-	// Requires VK_KHR_maintenance2 to be enabled
+
+    // Requires VK_KHR_maintenance2 to be enabled
     THSVS_ACCESS_DEPTH_ATTACHMENT_WRITE_STENCIL_READ_ONLY,                  // Written as a depth aspect of a depth/stencil attachment during rendering, whilst the stencil aspect is read-only
     THSVS_ACCESS_STENCIL_ATTACHMENT_WRITE_DEPTH_READ_ONLY,                  // Written as a stencil aspect of a depth/stencil attachment during rendering, whilst the depth aspect is read-only
-	
+
     THSVS_ACCESS_COMPUTE_SHADER_WRITE,                                      // Written as any resource in a compute shader
     THSVS_ACCESS_ANY_SHADER_WRITE,                                          // Written as any resource in any shader
     THSVS_ACCESS_TRANSFER_WRITE,                                            // Written as the destination of a transfer operation
@@ -236,8 +240,8 @@ THSVS_IMAGE_LAYOUT_OPTIMAL is usually preferred.
 typedef enum ThsvsImageLayout {
     THSVS_IMAGE_LAYOUT_OPTIMAL,                 // Choose the most optimal layout for each usage. Performs layout transitions as appropriate for the access.
     THSVS_IMAGE_LAYOUT_GENERAL,                 // Layout accessible by all Vulkan access types on a device - no layout transitions except for presentation
-	
-	// Requires VK_KHR_shared_presentable_image to be enabled. Can only be used for shared presentable images (i.e. single-buffered swapchains).
+
+    // Requires VK_KHR_shared_presentable_image to be enabled. Can only be used for shared presentable images (i.e. single-buffered swapchains).
     THSVS_IMAGE_LAYOUT_GENERAL_AND_PRESENTATION // As GENERAL, but also allows presentation engines to access it - no layout transitions
 } ThsvsImageLayout;
 
@@ -598,7 +602,7 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
     {   VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
         VK_ACCESS_UNIFORM_READ_BIT,
         VK_IMAGE_LAYOUT_UNDEFINED},
-	// THSVS_ACCESS_ANY_SHADER_READ_UNIFORM_BUFFER_OR_VERTEX_BUFFER
+    // THSVS_ACCESS_ANY_SHADER_READ_UNIFORM_BUFFER_OR_VERTEX_BUFFER
     {   VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
         VK_ACCESS_UNIFORM_READ_BIT | VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT,
         VK_IMAGE_LAYOUT_UNDEFINED},
@@ -671,7 +675,7 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
     {   VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
         VK_ACCESS_SHADER_WRITE_BIT,
         VK_IMAGE_LAYOUT_GENERAL},
-		
+
     // THSVS_ACCESS_ANY_SHADER_WRITE
     {   VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
         VK_ACCESS_SHADER_WRITE_BIT,
@@ -686,13 +690,13 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
         VK_ACCESS_HOST_WRITE_BIT,
         VK_IMAGE_LAYOUT_GENERAL},
 
-	// THSVS_ACCESS_COLOR_ATTACHMENT_READ_WRITE
+    // THSVS_ACCESS_COLOR_ATTACHMENT_READ_WRITE
     {   VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
         VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
         VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL},
     // THSVS_ACCESS_GENERAL
     {   VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-		VK_ACCESS_TYPE_MEMORY_READ_BIT | VK_ACCESS_TYPE_MEMORY_WRITE_BIT,
+        VK_ACCESS_TYPE_MEMORY_READ_BIT | VK_ACCESS_TYPE_MEMORY_WRITE_BIT,
         VK_IMAGE_LAYOUT_GENERAL}
 };
 
@@ -702,10 +706,12 @@ void thsvsGetVulkanMemoryBarrier(
     VkPipelineStageFlags*   pDstStages,
     VkMemoryBarrier*        pVkBarrier)
 {
+    *pSrcStages               = 0;
+    *pDstStages               = 0;
     pVkBarrier->sType         = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
     pVkBarrier->pNext         = NULL;
-	pVkBarrier->srcAccessMask = 0;
-	pVkBarrier->dstAccessMask = 0;
+    pVkBarrier->srcAccessMask = 0;
+    pVkBarrier->dstAccessMask = 0;
 
     for (int i = 0; i < thBarrier.prevAccessCount; ++i)
     {
@@ -742,10 +748,12 @@ void thsvsGetVulkanBufferMemoryBarrier(
     VkPipelineStageFlags*   pDstStages,
     VkBufferMemoryBarrier*  pVkBarrier)
 {
+    *pSrcStages                     = 0;
+    *pDstStages                     = 0;
     pVkBarrier->sType               = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
     pVkBarrier->pNext               = NULL;
-	pVkBarrier->srcAccessMask       = 0;
-	pVkBarrier->dstAccessMask       = 0;
+    pVkBarrier->srcAccessMask       = 0;
+    pVkBarrier->dstAccessMask       = 0;
     pVkBarrier->srcQueueFamilyIndex = thBarrier.srcQueueFamilyIndex;
     pVkBarrier->dstQueueFamilyIndex = thBarrier.dstQueueFamilyIndex;
     pVkBarrier->buffer              = thBarrier.buffer;
@@ -788,10 +796,12 @@ void thsvsGetVulkanImageMemoryBarrier(
     VkPipelineStageFlags*   pDstStages,
     VkImageMemoryBarrier*   pVkBarrier)
 {
+    *pSrcStages                     = 0;
+    *pDstStages                     = 0;
     pVkBarrier->sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     pVkBarrier->pNext               = NULL;
-	pVkBarrier->srcAccessMask       = 0;
-	pVkBarrier->dstAccessMask       = 0;
+    pVkBarrier->srcAccessMask       = 0;
+    pVkBarrier->dstAccessMask       = 0;
     pVkBarrier->srcQueueFamilyIndex = thBarrier.srcQueueFamilyIndex;
     pVkBarrier->dstQueueFamilyIndex = thBarrier.dstQueueFamilyIndex;
     pVkBarrier->image               = thBarrier.image;

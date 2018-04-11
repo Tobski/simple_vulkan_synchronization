@@ -20,11 +20,15 @@ will be generated in that file.
 
 ## Version
 
+alpha.5
+
+Alpha.5 now correctly zeroes out the pipeline stage flags before trying to incrementally set bits on them... common theme here, whoops.
+
+## Version History
+
 alpha.4
 
 Alpha.4 now correctly zeroes out the access types before trying to incrementally set bits on them (!)
-
-## Version History
 
 alpha.3
     
