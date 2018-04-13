@@ -726,7 +726,7 @@ void thsvsGetVulkanMemoryBarrier(
     pVkBarrier->srcAccessMask = 0;
     pVkBarrier->dstAccessMask = 0;
 
-    for (int i = 0; i < thBarrier.prevAccessCount; ++i)
+    for (uint32_t i = 0; i < thBarrier.prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = thBarrier.pPrevAccesses[i];
         const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
@@ -746,7 +746,7 @@ void thsvsGetVulkanMemoryBarrier(
             pVkBarrier->srcAccessMask |= pPrevAccessInfo->accessMask;
     }
 
-    for (int i = 0; i < thBarrier.nextAccessCount; ++i)
+    for (uint32_t i = 0; i < thBarrier.nextAccessCount; ++i)
     {
         ThsvsAccessType nextAccess = thBarrier.pNextAccesses[i];
         const ThsvsVkAccessInfo* pNextAccessInfo = &ThsvsAccessMap[nextAccess];
@@ -783,7 +783,7 @@ void thsvsGetVulkanBufferMemoryBarrier(
     pVkBarrier->offset              = thBarrier.offset;
     pVkBarrier->size                = thBarrier.size;
 
-    for (int i = 0; i < thBarrier.prevAccessCount; ++i)
+    for (uint32_t i = 0; i < thBarrier.prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = thBarrier.pPrevAccesses[i];
         const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
@@ -803,7 +803,7 @@ void thsvsGetVulkanBufferMemoryBarrier(
             pVkBarrier->srcAccessMask |= pPrevAccessInfo->accessMask;
     }
 
-    for (int i = 0; i < thBarrier.nextAccessCount; ++i)
+    for (uint32_t i = 0; i < thBarrier.nextAccessCount; ++i)
     {
         ThsvsAccessType nextAccess = thBarrier.pNextAccesses[i];
         const ThsvsVkAccessInfo* pNextAccessInfo = &ThsvsAccessMap[nextAccess];
@@ -842,7 +842,7 @@ void thsvsGetVulkanImageMemoryBarrier(
     pVkBarrier->oldLayout           = VK_IMAGE_LAYOUT_UNDEFINED;
     pVkBarrier->newLayout           = VK_IMAGE_LAYOUT_UNDEFINED;
 
-    for (int i = 0; i < thBarrier.prevAccessCount; ++i)
+    for (uint32_t i = 0; i < thBarrier.prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = thBarrier.pPrevAccesses[i];
         const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
@@ -867,7 +867,7 @@ void thsvsGetVulkanImageMemoryBarrier(
         }
         else
         {
-            VkImageLayout layout;
+            VkImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
 
             switch(thBarrier.prevLayout)
             {
@@ -898,7 +898,7 @@ void thsvsGetVulkanImageMemoryBarrier(
 #endif
     }
 
-    for (int i = 0; i < thBarrier.nextAccessCount; ++i)
+    for (uint32_t i = 0; i < thBarrier.nextAccessCount; ++i)
     {
         ThsvsAccessType nextAccess = thBarrier.pNextAccesses[i];
         const ThsvsVkAccessInfo* pNextAccessInfo = &ThsvsAccessMap[nextAccess];
@@ -916,7 +916,7 @@ void thsvsGetVulkanImageMemoryBarrier(
         *pDstStages |= pNextAccessInfo->stageMask;
         pVkBarrier->dstAccessMask |= pNextAccessInfo->accessMask;
 
-        VkImageLayout layout;
+        VkImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
         switch(thBarrier.nextLayout)
         {
             case THSVS_IMAGE_LAYOUT_GENERAL:
@@ -983,7 +983,7 @@ void thsvsCmdPipelineBarrier(
 
         VkPipelineStageFlags tempSrcStageMask = 0;
         VkPipelineStageFlags tempDstStageMask = 0;
-        for (int i = 0; i < bufferBarrierCount; ++i)
+        for (uint32_t i = 0; i < bufferBarrierCount; ++i)
         {
             thsvsGetVulkanBufferMemoryBarrier(pBufferBarriers[i], &tempSrcStageMask, &tempDstStageMask, &pBufferMemoryBarriers[i]);
             srcStageMask |= tempSrcStageMask;
@@ -998,7 +998,7 @@ void thsvsCmdPipelineBarrier(
 
         VkPipelineStageFlags tempSrcStageMask = 0;
         VkPipelineStageFlags tempDstStageMask = 0;
-        for (int i = 0; i < imageBarrierCount; ++i)
+        for (uint32_t i = 0; i < imageBarrierCount; ++i)
         {
             thsvsGetVulkanImageMemoryBarrier(pImageBarriers[i], &tempSrcStageMask, &tempDstStageMask, &pImageMemoryBarriers[i]);
             srcStageMask |= tempSrcStageMask;
@@ -1030,7 +1030,7 @@ void thsvsCmdSetEvent(
 {
     VkPipelineStageFlags stageMask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 
-    for (int i = 0; i < prevAccessCount; ++i)
+    for (uint32_t i = 0; i < prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = pPrevAccesses[i];
         const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
@@ -1057,7 +1057,7 @@ void thsvsCmdResetEvent(
 {
     VkPipelineStageFlags stageMask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 
-    for (int i = 0; i < prevAccessCount; ++i)
+    for (uint32_t i = 0; i < prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = pPrevAccesses[i];
         const ThsvsVkAccessInfo* pPrevAccessInfo = &ThsvsAccessMap[prevAccess];
@@ -1117,7 +1117,7 @@ void thsvsCmdWaitEvents(
 
         VkPipelineStageFlags tempSrcStageMask = 0;
         VkPipelineStageFlags tempDstStageMask = 0;
-        for (int i = 0; i < bufferBarrierCount; ++i)
+        for (uint32_t i = 0; i < bufferBarrierCount; ++i)
         {
             thsvsGetVulkanBufferMemoryBarrier(pBufferBarriers[i], &tempSrcStageMask, &tempDstStageMask, &pBufferMemoryBarriers[i]);
             srcStageMask |= tempSrcStageMask;
@@ -1132,7 +1132,7 @@ void thsvsCmdWaitEvents(
 
         VkPipelineStageFlags tempSrcStageMask = 0;
         VkPipelineStageFlags tempDstStageMask = 0;
-        for (int i = 0; i < imageBarrierCount; ++i)
+        for (uint32_t i = 0; i < imageBarrierCount; ++i)
         {
             thsvsGetVulkanImageMemoryBarrier(pImageBarriers[i], &tempSrcStageMask, &tempDstStageMask, &pImageMemoryBarriers[i]);
             srcStageMask |= tempSrcStageMask;
