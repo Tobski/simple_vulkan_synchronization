@@ -84,10 +84,12 @@ The thsvsCmdPipelineBarrier and thsvsCmdWaitEvents commands allocate
 temporary storage for the Vulkan barrier equivalents in order to pass them
 to the respective Vulkan commands.
 
-These use the `temp_alloc(size)` and `temp_free(x)` macros, which are by
-default set to `alloca(size)` and nothing, respectively.
+These use the `THSVS_TEMP_ALLOC(size)` and `THSVS_TEMP_FREE(x)` macros,
+which are by default set to alloca(size) and ((void)(x)), respectively.
 If you don't want to use stack space or would rather use your own
-allocation strategy, these can be overridden.
+allocation strategy, these can be overridden by defining these macros
+in before #include-ing the header file with
+THSVS_SIMPLER_VULKAN_SYNCHRONIZATION_IMPLEMENTATION defined.
 
 I'd rather avoid the need for these allocations in what are likely to be
 high-traffic commands, but currently just want to ship something - may
