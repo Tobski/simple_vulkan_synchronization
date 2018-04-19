@@ -104,10 +104,12 @@ MEMORY ALLOCATION
     storage for the Vulkan barrier equivalents in order to pass them to the
     respective Vulkan commands.
 
-    These use the `temp_alloc(size)` and `temp_free(x)` macros, which are by
-    default set to alloca(size) and (0), respectively.
+    These use the `THSVS_TEMP_ALLOC(size)` and `THSVS_TEMP_FREE(x)` macros,
+    which are by default set to alloca(size) and ((void)(x)), respectively.
     If you don't want to use stack space or would rather use your own
-    allocation strategy, these can be overridden.
+    allocation strategy, these can be overridden by defining these macros
+    in before #include-ing the header file with
+    THSVS_SIMPLER_VULKAN_SYNCHRONIZATION_IMPLEMENTATION defined.
 
     I'd rather avoid the need for these allocations in what are likely to be
     high-traffic commands, but currently just want to ship something - may
@@ -483,9 +485,13 @@ May consider other allocation strategies in future.
   #include <alloca.h>
 #endif
 
-#define temp_alloc(size)              (alloca(size))
-#define temp_free(x)
+#if !defined(THSVS_TEMP_ALLOC)
+#define THSVS_TEMP_ALLOC(size)              (alloca(size))
+#endif
 
+#if !defined(THSVS_TEMP_FREE)
+#define THSVS_TEMP_FREE(x)                  ((void)(x))
+#endif
 
 typedef struct ThsvsVkAccessInfo {
     VkPipelineStageFlags    stageMask;
@@ -979,7 +985,7 @@ void thsvsCmdPipelineBarrier(
     // Buffer memory barriers
     if (bufferBarrierCount > 0)
     {
-        pBufferMemoryBarriers = (VkBufferMemoryBarrier*)temp_alloc(sizeof(VkBufferMemoryBarrier) * bufferMemoryBarrierCount);
+        pBufferMemoryBarriers = (VkBufferMemoryBarrier*)THSVS_TEMP_ALLOC(sizeof(VkBufferMemoryBarrier) * bufferMemoryBarrierCount);
 
         VkPipelineStageFlags tempSrcStageMask = 0;
         VkPipelineStageFlags tempDstStageMask = 0;
@@ -994,7 +1000,7 @@ void thsvsCmdPipelineBarrier(
     // Image memory barriers
     if (imageBarrierCount > 0)
     {
-        pImageMemoryBarriers = (VkImageMemoryBarrier*)temp_alloc(sizeof(VkImageMemoryBarrier) * imageMemoryBarrierCount);
+        pImageMemoryBarriers = (VkImageMemoryBarrier*)THSVS_TEMP_ALLOC(sizeof(VkImageMemoryBarrier) * imageMemoryBarrierCount);
 
         VkPipelineStageFlags tempSrcStageMask = 0;
         VkPipelineStageFlags tempDstStageMask = 0;
@@ -1018,8 +1024,8 @@ void thsvsCmdPipelineBarrier(
         imageMemoryBarrierCount,
         pImageMemoryBarriers);
 
-    temp_free(pBufferMemoryBarriers);
-    temp_free(pImageMemoryBarriers);
+    THSVS_TEMP_FREE(pBufferMemoryBarriers);
+    THSVS_TEMP_FREE(pImageMemoryBarriers);
 }
 
 void thsvsCmdSetEvent(
@@ -1113,7 +1119,7 @@ void thsvsCmdWaitEvents(
     // Buffer memory barriers
     if (bufferBarrierCount > 0)
     {
-        pBufferMemoryBarriers = (VkBufferMemoryBarrier*)temp_alloc(sizeof(VkBufferMemoryBarrier) * bufferMemoryBarrierCount);
+        pBufferMemoryBarriers = (VkBufferMemoryBarrier*)THSVS_TEMP_ALLOC(sizeof(VkBufferMemoryBarrier) * bufferMemoryBarrierCount);
 
         VkPipelineStageFlags tempSrcStageMask = 0;
         VkPipelineStageFlags tempDstStageMask = 0;
@@ -1128,7 +1134,7 @@ void thsvsCmdWaitEvents(
     // Image memory barriers
     if (imageBarrierCount > 0)
     {
-        pImageMemoryBarriers = (VkImageMemoryBarrier*)temp_alloc(sizeof(VkImageMemoryBarrier) * imageMemoryBarrierCount);
+        pImageMemoryBarriers = (VkImageMemoryBarrier*)THSVS_TEMP_ALLOC(sizeof(VkImageMemoryBarrier) * imageMemoryBarrierCount);
 
         VkPipelineStageFlags tempSrcStageMask = 0;
         VkPipelineStageFlags tempDstStageMask = 0;
@@ -1153,8 +1159,8 @@ void thsvsCmdWaitEvents(
         imageMemoryBarrierCount,
         pImageMemoryBarriers);
 
-    temp_free(pBufferMemoryBarriers);
-    temp_free(pImageMemoryBarriers);
+    THSVS_TEMP_FREE(pBufferMemoryBarriers);
+    THSVS_TEMP_FREE(pImageMemoryBarriers);
 }
 
 #endif // THSVS_SIMPLER_VULKAN_SYNCHRONIZATION_IMPLEMENTATION
