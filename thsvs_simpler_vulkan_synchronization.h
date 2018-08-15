@@ -755,6 +755,8 @@ void thsvsGetVulkanMemoryBarrier(
 #endif
 
         *pSrcStages |= pPrevAccessInfo->stageMask;
+        
+        // Add appropriate availability operations - for writes only.
         if (prevAccess > THSVS_ACCESS_PRESENT)
             pVkBarrier->srcAccessMask |= pPrevAccessInfo->accessMask;
     }
@@ -774,7 +776,12 @@ void thsvsGetVulkanMemoryBarrier(
         assert(nextAccess <= THSVS_ACCESS_PRESENT || thBarrier.nextAccessCount == 1);
 #endif
         *pDstStages |= pNextAccessInfo->stageMask;
-        pVkBarrier->dstAccessMask |= pNextAccessInfo->accessMask;
+        
+        // Add visibility operations as necessary.
+        // If the src access mask, this is a WAR hazard (or for some reason a "RAR"),
+        // so the dst access mask can be safely zeroed as these don't need visibility.
+        if (pVkBarrier->srcAccessMask != 0)
+            pVkBarrier->dstAccessMask |= pNextAccessInfo->accessMask;
     }
     
     // Ensure that the stage masks are valid if no stages were determined
@@ -818,6 +825,8 @@ void thsvsGetVulkanBufferMemoryBarrier(
 #endif
 
         *pSrcStages |= pPrevAccessInfo->stageMask;
+        
+        // Add appropriate availability operations - for writes only.
         if (prevAccess > THSVS_ACCESS_PRESENT)
             pVkBarrier->srcAccessMask |= pPrevAccessInfo->accessMask;
     }
@@ -838,7 +847,12 @@ void thsvsGetVulkanBufferMemoryBarrier(
 #endif
 
         *pDstStages |= pNextAccessInfo->stageMask;
-        pVkBarrier->dstAccessMask |= pNextAccessInfo->accessMask;
+        
+        // Add visibility operations as necessary.
+        // If the src access mask, this is a WAR hazard (or for some reason a "RAR"),
+        // so the dst access mask can be safely zeroed as these don't need visibility.
+        if (pVkBarrier->srcAccessMask != 0)
+            pVkBarrier->dstAccessMask |= pNextAccessInfo->accessMask;
     }
     
     // Ensure that the stage masks are valid if no stages were determined
@@ -883,6 +897,8 @@ void thsvsGetVulkanImageMemoryBarrier(
 #endif
 
         *pSrcStages |= pPrevAccessInfo->stageMask;
+        
+        // Add appropriate availability operations - for writes only.
         if (prevAccess > THSVS_ACCESS_PRESENT)
             pVkBarrier->srcAccessMask |= pPrevAccessInfo->accessMask;
 
@@ -939,7 +955,12 @@ void thsvsGetVulkanImageMemoryBarrier(
 #endif
 
         *pDstStages |= pNextAccessInfo->stageMask;
-        pVkBarrier->dstAccessMask |= pNextAccessInfo->accessMask;
+        
+        // Add visibility operations as necessary.
+        // If the src access mask, this is a WAR hazard (or for some reason a "RAR"),
+        // so the dst access mask can be safely zeroed as these don't need visibility.
+        if (pVkBarrier->srcAccessMask != 0)
+            pVkBarrier->dstAccessMask |= pNextAccessInfo->accessMask;
 
         VkImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
         switch(thBarrier.nextLayout)
