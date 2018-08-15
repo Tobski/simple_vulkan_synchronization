@@ -732,8 +732,8 @@ void thsvsGetVulkanMemoryBarrier(
     VkPipelineStageFlags*   pDstStages,
     VkMemoryBarrier*        pVkBarrier)
 {
-    *pSrcStages               = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-    *pDstStages               = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+    *pSrcStages               = 0;
+    *pDstStages               = 0;
     pVkBarrier->sType         = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
     pVkBarrier->pNext         = NULL;
     pVkBarrier->srcAccessMask = 0;
@@ -776,6 +776,12 @@ void thsvsGetVulkanMemoryBarrier(
         *pDstStages |= pNextAccessInfo->stageMask;
         pVkBarrier->dstAccessMask |= pNextAccessInfo->accessMask;
     }
+    
+    // Ensure that the stage masks are valid if no stages were determined
+    if (*pSrcStages == 0)
+        *pSrcStages = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+    if (*pDstStages == 0)
+        *pDstStages = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
 }
 
 void thsvsGetVulkanBufferMemoryBarrier(
@@ -784,8 +790,8 @@ void thsvsGetVulkanBufferMemoryBarrier(
     VkPipelineStageFlags*   pDstStages,
     VkBufferMemoryBarrier*  pVkBarrier)
 {
-    *pSrcStages                     = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-    *pDstStages                     = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+    *pSrcStages                     = 0;
+    *pDstStages                     = 0;
     pVkBarrier->sType               = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
     pVkBarrier->pNext               = NULL;
     pVkBarrier->srcAccessMask       = 0;
@@ -834,6 +840,12 @@ void thsvsGetVulkanBufferMemoryBarrier(
         *pDstStages |= pNextAccessInfo->stageMask;
         pVkBarrier->dstAccessMask |= pNextAccessInfo->accessMask;
     }
+    
+    // Ensure that the stage masks are valid if no stages were determined
+    if (*pSrcStages == 0)
+        *pSrcStages = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+    if (*pDstStages == 0)
+        *pDstStages = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
 }
 
 void thsvsGetVulkanImageMemoryBarrier(
@@ -842,8 +854,8 @@ void thsvsGetVulkanImageMemoryBarrier(
     VkPipelineStageFlags*   pDstStages,
     VkImageMemoryBarrier*   pVkBarrier)
 {
-    *pSrcStages                     = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-    *pDstStages                     = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+    *pSrcStages                     = 0;
+    *pDstStages                     = 0;
     pVkBarrier->sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     pVkBarrier->pNext               = NULL;
     pVkBarrier->srcAccessMask       = 0;
@@ -957,6 +969,12 @@ void thsvsGetVulkanImageMemoryBarrier(
     assert(pVkBarrier->newLayout != pVkBarrier->oldLayout ||
            pVkBarrier->srcQueueFamilyIndex != pVkBarrier->dstQueueFamilyIndex);
 #endif
+
+    // Ensure that the stage masks are valid if no stages were determined
+    if (*pSrcStages == 0)
+        *pSrcStages = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+    if (*pDstStages == 0)
+        *pDstStages = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
 }
 
 void thsvsCmdPipelineBarrier(
