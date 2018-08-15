@@ -485,6 +485,13 @@ May consider other allocation strategies in future.
   #include <alloca.h>
 #endif
 
+#if defined(THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE) || \
+    defined(THSVS_ERROR_CHECK_COULD_USE_GLOBAL_BARRIER) || \
+    defined(THSVS_ERROR_CHECK_MIXED_IMAGE_LAYOUT) || \
+    defined(THSVS_ERROR_CHECK_POTENTIAL_HAZARD)
+  #include <assert.h>
+#endif
+
 #if !defined(THSVS_TEMP_ALLOC)
 #define THSVS_TEMP_ALLOC(size)              (alloca(size))
 #endif
