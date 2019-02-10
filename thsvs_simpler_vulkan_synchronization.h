@@ -263,7 +263,7 @@ typedef enum ThsvsAccessType {
     THSVS_ACCESS_COMPUTE_SHADER_WRITE,                                      // Written as any resource in a compute shader
     THSVS_ACCESS_ANY_SHADER_WRITE,                                          // Written as any resource in any shader
     THSVS_ACCESS_TRANSFER_WRITE,                                            // Written as the destination of a transfer operation
-	THSVS_ACCESS_HOST_PREINITIALIZED,                                       // Data pre-filled by host before device access starts
+    THSVS_ACCESS_HOST_PREINITIALIZED,                                       // Data pre-filled by host before device access starts
     THSVS_ACCESS_HOST_WRITE,                                                // Written on the host
 
     // Requires VK_NV_ray_tracing to be enabled
@@ -572,7 +572,7 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
     // THSVS_ACCESS_VERTEX_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER
     {   VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
         VK_ACCESS_SHADER_READ_BIT,
-        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL },
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
     // THSVS_ACCESS_VERTEX_SHADER_READ_OTHER
     {   VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
         VK_ACCESS_SHADER_READ_BIT,
@@ -585,7 +585,7 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
     // THSVS_ACCESS_TESSELLATION_CONTROL_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER
     {   VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT,
         VK_ACCESS_SHADER_READ_BIT,
-        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL },
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
     // THSVS_ACCESS_TESSELLATION_CONTROL_SHADER_READ_OTHER
     {   VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT,
         VK_ACCESS_SHADER_READ_BIT,
@@ -598,7 +598,7 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
     // THSVS_ACCESS_TESSELLATION_EVALUATION_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER
     {   VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT,
         VK_ACCESS_SHADER_READ_BIT,
-        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL },
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
     // THSVS_ACCESS_TESSELLATION_EVALUATION_SHADER_READ_OTHER
     {   VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT,
         VK_ACCESS_SHADER_READ_BIT,
@@ -611,7 +611,7 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
     // THSVS_ACCESS_GEOMETRY_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER
     {   VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT,
         VK_ACCESS_SHADER_READ_BIT,
-        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL },
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
     // THSVS_ACCESS_GEOMETRY_SHADER_READ_OTHER
     {   VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT,
         VK_ACCESS_SHADER_READ_BIT,
@@ -663,7 +663,7 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
     // THSVS_ACCESS_FRAGMENT_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER
     {   VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
         VK_ACCESS_SHADER_READ_BIT,
-        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL },
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
     // THSVS_ACCESS_FRAGMENT_SHADER_READ_COLOR_INPUT_ATTACHMENT
     {   VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
         VK_ACCESS_INPUT_ATTACHMENT_READ_BIT,
@@ -696,7 +696,7 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
     // THSVS_ACCESS_COMPUTE_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER
     {   VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
         VK_ACCESS_SHADER_READ_BIT,
-        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL },
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
     // THSVS_ACCESS_COMPUTE_SHADER_READ_OTHER
     {   VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
         VK_ACCESS_SHADER_READ_BIT,
@@ -713,7 +713,7 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
     // THSVS_ACCESS_ANY_SHADER_READ_SAMPLED_IMAGE
     {   VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
         VK_ACCESS_SHADER_READ_BIT,
-        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL },
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
     // THSVS_ACCESS_ANY_SHADER_READ_OTHER
     {   VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
         VK_ACCESS_SHADER_READ_BIT,
@@ -874,7 +874,7 @@ void thsvsGetVulkanMemoryBarrier(
 #endif
 
         *pSrcStages |= pPrevAccessInfo->stageMask;
-        
+
         // Add appropriate availability operations - for writes only.
         if (prevAccess > THSVS_END_OF_READ_ACCESS)
             pVkBarrier->srcAccessMask |= pPrevAccessInfo->accessMask;
@@ -895,14 +895,14 @@ void thsvsGetVulkanMemoryBarrier(
         assert(nextAccess < THSVS_END_OF_READ_ACCESS || thBarrier.nextAccessCount == 1);
 #endif
         *pDstStages |= pNextAccessInfo->stageMask;
-        
+
         // Add visibility operations as necessary.
         // If the src access mask, this is a WAR hazard (or for some reason a "RAR"),
         // so the dst access mask can be safely zeroed as these don't need visibility.
         if (pVkBarrier->srcAccessMask != 0)
             pVkBarrier->dstAccessMask |= pNextAccessInfo->accessMask;
     }
-    
+
     // Ensure that the stage masks are valid if no stages were determined
     if (*pSrcStages == 0)
         *pSrcStages = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
@@ -944,7 +944,7 @@ void thsvsGetVulkanBufferMemoryBarrier(
 #endif
 
         *pSrcStages |= pPrevAccessInfo->stageMask;
-        
+
         // Add appropriate availability operations - for writes only.
         if (prevAccess > THSVS_END_OF_READ_ACCESS)
             pVkBarrier->srcAccessMask |= pPrevAccessInfo->accessMask;
@@ -966,14 +966,14 @@ void thsvsGetVulkanBufferMemoryBarrier(
 #endif
 
         *pDstStages |= pNextAccessInfo->stageMask;
-        
+
         // Add visibility operations as necessary.
         // If the src access mask, this is a WAR hazard (or for some reason a "RAR"),
         // so the dst access mask can be safely zeroed as these don't need visibility.
         if (pVkBarrier->srcAccessMask != 0)
             pVkBarrier->dstAccessMask |= pNextAccessInfo->accessMask;
     }
-    
+
     // Ensure that the stage masks are valid if no stages were determined
     if (*pSrcStages == 0)
         *pSrcStages = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
@@ -1016,7 +1016,7 @@ void thsvsGetVulkanImageMemoryBarrier(
 #endif
 
         *pSrcStages |= pPrevAccessInfo->stageMask;
-        
+
         // Add appropriate availability operations - for writes only.
         if (prevAccess > THSVS_END_OF_READ_ACCESS)
             pVkBarrier->srcAccessMask |= pPrevAccessInfo->accessMask;
@@ -1074,7 +1074,7 @@ void thsvsGetVulkanImageMemoryBarrier(
 #endif
 
         *pDstStages |= pNextAccessInfo->stageMask;
-        
+
         // Add visibility operations as necessary.
         // If the src access mask, this is a WAR hazard (or for some reason a "RAR"),
         // so the dst access mask can be safely zeroed as these don't need visibility.
