@@ -195,12 +195,22 @@ typedef enum ThsvsAccessType {
     THSVS_ACCESS_GEOMETRY_SHADER_READ_UNIFORM_BUFFER,                       // Read as a uniform buffer in a geometry shader
     THSVS_ACCESS_GEOMETRY_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER,// Read as a sampled image/uniform texel buffer  in a geometry shader
     THSVS_ACCESS_GEOMETRY_SHADER_READ_OTHER,                                // Read as any other resource in a geometry shader
+    THSVS_ACCESS_TASK_SHADER_READ_UNIFORM_BUFFER_NV,                        // Read as a uniform buffer in a task shader
+    THSVS_ACCESS_TASK_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER_NV, // Read as a sampled image/uniform texel buffer in a task shader
+    THSVS_ACCESS_TASK_SHADER_READ_OTHER_NV,                                 // Read as any other resource in a task shader
+    THSVS_ACCESS_MESH_SHADER_READ_UNIFORM_BUFFER_NV,                        // Read as a uniform buffer in a mesh shader
+    THSVS_ACCESS_MESH_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER_NV, // Read as a sampled image/uniform texel buffer in a mesh shader
+    THSVS_ACCESS_MESH_SHADER_READ_OTHER_NV,                                 // Read as any other resource in a mesh shader
+    THSVS_ACCESS_TRANSFORM_FEEDBACK_COUNTER_READ_EXT,                       // Read as a transform feedback counter buffer
+    THSVS_ACCESS_FRAGMENT_DENSITY_MAP_READ_EXT,                             // Read as a fragment density map image
+    THSVS_ACCESS_SHADING_RATE_READ_NV,                                      // Read as a shading rate image
     THSVS_ACCESS_FRAGMENT_SHADER_READ_UNIFORM_BUFFER,                       // Read as a uniform buffer in a fragment shader
     THSVS_ACCESS_FRAGMENT_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER,// Read as a sampled image/uniform texel buffer  in a fragment shader
     THSVS_ACCESS_FRAGMENT_SHADER_READ_COLOR_INPUT_ATTACHMENT,               // Read as an input attachment with a color format in a fragment shader
     THSVS_ACCESS_FRAGMENT_SHADER_READ_DEPTH_STENCIL_INPUT_ATTACHMENT,       // Read as an input attachment with a depth/stencil format in a fragment shader
     THSVS_ACCESS_FRAGMENT_SHADER_READ_OTHER,                                // Read as any other resource in a fragment shader
-    THSVS_ACCESS_COLOR_ATTACHMENT_READ,                                     // Read by blending/logic operations or subpass load operations
+    THSVS_ACCESS_COLOR_ATTACHMENT_READ,                                     // Read by standard blending/logic operations or subpass load operations
+    THSVS_ACCESS_COLOR_ATTACHMENT_ADVANCED_BLENDING_EXT,                    // Read by advanced blending, standard blending, logic operations, or subpass load operations
     THSVS_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ,                             // Read by depth/stencil tests or subpass load operations
     THSVS_ACCESS_COMPUTE_SHADER_READ_UNIFORM_BUFFER,                        // Read as a uniform buffer in a compute shader
     THSVS_ACCESS_COMPUTE_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER, // Read as a sampled image/uniform texel buffer in a compute shader
@@ -211,7 +221,19 @@ typedef enum ThsvsAccessType {
     THSVS_ACCESS_ANY_SHADER_READ_OTHER,                                     // Read as any other resource (excluding attachments) in any shader
     THSVS_ACCESS_TRANSFER_READ,                                             // Read as the source of a transfer operation
     THSVS_ACCESS_HOST_READ,                                                 // Read on the host
+
+    // Requires VK_KHR_swapchain to be enabled
     THSVS_ACCESS_PRESENT,                                                   // Read by the presentation engine (i.e. vkQueuePresentKHR)
+
+    // Requires VK_EXT_conditional_rendering to be enabled
+    THSVS_ACCESS_CONDITIONAL_RENDERING_READ_EXT,                            // Read by conditional rendering
+
+    // Requires VK_NV_ray_tracing to be enabled
+    THSVS_ACCESS_RAY_TRACING_SHADER_ACCELERATION_STRUCTURE_READ_NV,         // Read by a ray tracing shader as an acceleration structure
+    THSVS_ACCESS_ACCELERATION_STRUCTURE_BUILD_READ_NV,                      // Read as an acceleration structure during a build
+
+    // Read accesses end
+    THSVS_END_OF_READ_ACCESS,
 
 // Write access
     // Requires VK_NVX_device_generated_commands to be enabled
@@ -221,6 +243,15 @@ typedef enum ThsvsAccessType {
     THSVS_ACCESS_TESSELLATION_CONTROL_SHADER_WRITE,                         // Written as any resource in a tessellation control shader
     THSVS_ACCESS_TESSELLATION_EVALUATION_SHADER_WRITE,                      // Written as any resource in a tessellation evaluation shader
     THSVS_ACCESS_GEOMETRY_SHADER_WRITE,                                     // Written as any resource in a geometry shader
+
+    // Requires VK_NV_mesh_shading to be enabled
+    THSVS_ACCESS_TASK_SHADER_WRITE_NV,                                      // Written as any resource in a task shader
+    THSVS_ACCESS_MESH_SHADER_WRITE_NV,                                      // Written as any resource in a mesh shader
+
+    // Requires VK_EXT_transform_feedback to be enabled
+    THSVS_ACCESS_TRANSFORM_FEEDBACK_WRITE_EXT,                              // Written as a transform feedback buffer
+    THSVS_ACCESS_TRANSFORM_FEEDBACK_COUNTER_WRITE_EXT,                      // Written as a transform feedback counter buffer
+
     THSVS_ACCESS_FRAGMENT_SHADER_WRITE,                                     // Written as any resource in a fragment shader
     THSVS_ACCESS_COLOR_ATTACHMENT_WRITE,                                    // Written as a color attachment during rendering, or via a subpass store op
     THSVS_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE,                            // Written as a depth/stencil attachment during rendering, or via a subpass store op
@@ -234,6 +265,9 @@ typedef enum ThsvsAccessType {
     THSVS_ACCESS_TRANSFER_WRITE,                                            // Written as the destination of a transfer operation
 	THSVS_ACCESS_HOST_PREINITIALIZED,                                       // Data pre-filled by host before device access starts
     THSVS_ACCESS_HOST_WRITE,                                                // Written on the host
+
+    // Requires VK_NV_ray_tracing to be enabled
+    THSVS_ACCESS_ACCELERATION_STRUCTURE_BUILD_WRITE_NV,                     // Written as an acceleration structure during a build
 
     THSVS_ACCESS_COLOR_ATTACHMENT_READ_WRITE,                               // Read or written as a color attachment during rendering
 // General access
@@ -583,6 +617,45 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
         VK_ACCESS_SHADER_READ_BIT,
         VK_IMAGE_LAYOUT_GENERAL},
 
+    // THSVS_ACCESS_TASK_SHADER_READ_UNIFORM_BUFFER_NV
+    {   VK_PIPELINE_STAGE_TASK_SHADER_BIT_NV,
+        VK_ACCESS_UNIFORM_READ_BIT,
+        VK_IMAGE_LAYOUT_UNDEFINED},
+    // THSVS_ACCESS_TASK_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER_NV
+    {   VK_PIPELINE_STAGE_TASK_SHADER_BIT_NV,
+        VK_ACCESS_SHADER_READ_BIT,
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
+    // THSVS_ACCESS_TASK_SHADER_READ_OTHER_NV
+    {   VK_PIPELINE_STAGE_TASK_SHADER_BIT_NV,
+        VK_ACCESS_SHADER_READ_BIT,
+        VK_IMAGE_LAYOUT_GENERAL},
+
+    // THSVS_ACCESS_MESH_SHADER_READ_UNIFORM_BUFFER_NV
+    {   VK_PIPELINE_STAGE_MESH_SHADER_BIT_NV,
+        VK_ACCESS_UNIFORM_READ_BIT,
+        VK_IMAGE_LAYOUT_UNDEFINED},
+    // THSVS_ACCESS_MESH_SHADER_READ_SAMPLED_IMAGE_OR_UNIFORM_TEXEL_BUFFER_NV
+    {   VK_PIPELINE_STAGE_MESH_SHADER_BIT_NV,
+        VK_ACCESS_SHADER_READ_BIT,
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL},
+    // THSVS_ACCESS_MESH_SHADER_READ_OTHER_NV
+    {   VK_PIPELINE_STAGE_MESH_SHADER_BIT_NV,
+        VK_ACCESS_SHADER_READ_BIT,
+        VK_IMAGE_LAYOUT_GENERAL},
+
+    // THSVS_ACCESS_TRANSFORM_FEEDBACK_COUNTER_READ_EXT
+    {   VK_PIPELINE_STAGE_TRANSFORM_FEEDBACK_BIT_EXT,
+        VK_ACCESS_TRANSFORM_FEEDBACK_COUNTER_READ_BIT_EXT,
+        VK_IMAGE_LAYOUT_UNDEFINED},
+    // THSVS_ACCESS_FRAGMENT_DENSITY_MAP_READ_EXT
+    {   VK_PIPELINE_STAGE_FRAGMENT_DENSITY_PROCESS_BIT_EXT,
+        VK_ACCESS_FRAGMENT_DENSITY_MAP_READ_BIT_EXT,
+        VK_IMAGE_LAYOUT_FRAGMENT_DENSITY_MAP_OPTIMAL_EXT},
+    // THSVS_ACCESS_SHADING_RATE_READ_NV
+    {   VK_PIPELINE_STAGE_SHADING_RATE_IMAGE_BIT_NV,
+        VK_ACCESS_SHADING_RATE_IMAGE_READ_BIT_NV,
+        VK_IMAGE_LAYOUT_SHADING_RATE_OPTIMAL_NV},
+
     // THSVS_ACCESS_FRAGMENT_SHADER_READ_UNIFORM_BUFFER
     {   VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
         VK_ACCESS_UNIFORM_READ_BIT,
@@ -606,6 +679,10 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
     // THSVS_ACCESS_COLOR_ATTACHMENT_READ
     {   VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
         VK_ACCESS_COLOR_ATTACHMENT_READ_BIT,
+        VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL},
+    // THSVS_ACCESS_COLOR_ATTACHMENT_ADVANCED_BLENDING_EXT
+    {   VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+        VK_ACCESS_COLOR_ATTACHMENT_READ_NONCOHERENT_BIT_EXT,
         VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL},
     // THSVS_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ
     {   VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
@@ -654,6 +731,23 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
     {   0,
         0,
         VK_IMAGE_LAYOUT_PRESENT_SRC_KHR},
+    // THSVS_ACCESS_CONDITIONAL_RENDERING_READ_EXT
+    {   VK_PIPELINE_STAGE_CONDITIONAL_RENDERING_BIT_EXT,
+        VK_ACCESS_CONDITIONAL_RENDERING_READ_BIT_EXT,
+        VK_IMAGE_LAYOUT_UNDEFINED},
+
+    // THSVS_ACCESS_RAY_TRACING_SHADER_ACCELERATION_STRUCTURE_READ_NV
+    {   VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_NV,
+        VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_NV,
+        VK_IMAGE_LAYOUT_UNDEFINED},
+    // THSVS_ACCESS_ACCELERATION_STRUCTURE_BUILD_READ_NV
+    {   VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_NV,
+        VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_NV,
+        VK_IMAGE_LAYOUT_UNDEFINED},
+    // THSVS_END_OF_READ_ACCESS
+    {   0,
+        0,
+        VK_IMAGE_LAYOUT_UNDEFINED},
 
 // Write access
     // THSVS_ACCESS_COMMAND_BUFFER_WRITE_NVX
@@ -677,6 +771,22 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
     {   VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT,
         VK_ACCESS_SHADER_WRITE_BIT,
         VK_IMAGE_LAYOUT_GENERAL},
+    // THSVS_ACCESS_TASK_SHADER_WRITE_NV
+    {   VK_PIPELINE_STAGE_TASK_SHADER_BIT_NV,
+        VK_ACCESS_SHADER_WRITE_BIT,
+        VK_IMAGE_LAYOUT_GENERAL},
+    // THSVS_ACCESS_MESH_SHADER_WRITE_NV
+    {   VK_PIPELINE_STAGE_MESH_SHADER_BIT_NV,
+        VK_ACCESS_SHADER_WRITE_BIT,
+        VK_IMAGE_LAYOUT_GENERAL},
+    // THSVS_ACCESS_TRANSFORM_FEEDBACK_WRITE_EXT
+    {   VK_PIPELINE_STAGE_TRANSFORM_FEEDBACK_BIT_EXT,
+        VK_ACCESS_TRANSFORM_FEEDBACK_WRITE_BIT_EXT,
+        VK_IMAGE_LAYOUT_UNDEFINED},
+    // THSVS_ACCESS_TRANSFORM_FEEDBACK_COUNTER_WRITE_EXT
+    {   VK_PIPELINE_STAGE_TRANSFORM_FEEDBACK_BIT_EXT,
+        VK_ACCESS_TRANSFORM_FEEDBACK_COUNTER_WRITE_BIT_EXT,
+        VK_IMAGE_LAYOUT_UNDEFINED},
     // THSVS_ACCESS_FRAGMENT_SHADER_WRITE
     {   VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
         VK_ACCESS_SHADER_WRITE_BIT,
@@ -720,6 +830,10 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
     {   VK_PIPELINE_STAGE_HOST_BIT,
         VK_ACCESS_HOST_WRITE_BIT,
         VK_IMAGE_LAYOUT_GENERAL},
+    // THSVS_ACCESS_ACCELERATION_STRUCTURE_BUILD_WRITE_NV
+    {   VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_NV,
+        VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_NV,
+        VK_IMAGE_LAYOUT_UNDEFINED},
 
     // THSVS_ACCESS_COLOR_ATTACHMENT_READ_WRITE
     {   VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
@@ -756,13 +870,13 @@ void thsvsGetVulkanMemoryBarrier(
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
         // Asserts that the access is a read, else it's a write and it should appear on its own.
-        assert(prevAccess <= THSVS_ACCESS_PRESENT || thBarrier.prevAccessCount == 1);
+        assert(prevAccess < THSVS_END_OF_READ_ACCESS || thBarrier.prevAccessCount == 1);
 #endif
 
         *pSrcStages |= pPrevAccessInfo->stageMask;
         
         // Add appropriate availability operations - for writes only.
-        if (prevAccess > THSVS_ACCESS_PRESENT)
+        if (prevAccess > THSVS_END_OF_READ_ACCESS)
             pVkBarrier->srcAccessMask |= pPrevAccessInfo->accessMask;
     }
 
@@ -778,7 +892,7 @@ void thsvsGetVulkanMemoryBarrier(
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
         // Asserts that the access is a read, else it's a write and it should appear on its own.
-        assert(nextAccess <= THSVS_ACCESS_PRESENT || thBarrier.nextAccessCount == 1);
+        assert(nextAccess < THSVS_END_OF_READ_ACCESS || thBarrier.nextAccessCount == 1);
 #endif
         *pDstStages |= pNextAccessInfo->stageMask;
         
@@ -826,13 +940,13 @@ void thsvsGetVulkanBufferMemoryBarrier(
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
         // Asserts that the access is a read, else it's a write and it should appear on its own.
-        assert(prevAccess <= THSVS_ACCESS_PRESENT || thBarrier.prevAccessCount == 1);
+        assert(prevAccess < THSVS_END_OF_READ_ACCESS || thBarrier.prevAccessCount == 1);
 #endif
 
         *pSrcStages |= pPrevAccessInfo->stageMask;
         
         // Add appropriate availability operations - for writes only.
-        if (prevAccess > THSVS_ACCESS_PRESENT)
+        if (prevAccess > THSVS_END_OF_READ_ACCESS)
             pVkBarrier->srcAccessMask |= pPrevAccessInfo->accessMask;
     }
 
@@ -848,7 +962,7 @@ void thsvsGetVulkanBufferMemoryBarrier(
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
         // Asserts that the access is a read, else it's a write and it should appear on its own.
-        assert(nextAccess <= THSVS_ACCESS_PRESENT || thBarrier.nextAccessCount == 1);
+        assert(nextAccess < THSVS_END_OF_READ_ACCESS || thBarrier.nextAccessCount == 1);
 #endif
 
         *pDstStages |= pNextAccessInfo->stageMask;
@@ -898,13 +1012,13 @@ void thsvsGetVulkanImageMemoryBarrier(
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
         // Asserts that the access is a read, else it's a write and it should appear on its own.
-        assert(prevAccess <= THSVS_ACCESS_PRESENT || thBarrier.prevAccessCount == 1);
+        assert(prevAccess < THSVS_END_OF_READ_ACCESS || thBarrier.prevAccessCount == 1);
 #endif
 
         *pSrcStages |= pPrevAccessInfo->stageMask;
         
         // Add appropriate availability operations - for writes only.
-        if (prevAccess > THSVS_ACCESS_PRESENT)
+        if (prevAccess > THSVS_END_OF_READ_ACCESS)
             pVkBarrier->srcAccessMask |= pPrevAccessInfo->accessMask;
 
         if (thBarrier.discardContents == VK_TRUE)
@@ -956,7 +1070,7 @@ void thsvsGetVulkanImageMemoryBarrier(
 
 #ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
         // Asserts that the access is a read, else it's a write and it should appear on its own.
-        assert(nextAccess <= THSVS_ACCESS_PRESENT || thBarrier.nextAccessCount == 1);
+        assert(nextAccess < THSVS_END_OF_READ_ACCESS || thBarrier.nextAccessCount == 1);
 #endif
 
         *pDstStages |= pNextAccessInfo->stageMask;
