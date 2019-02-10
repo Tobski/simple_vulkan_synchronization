@@ -232,6 +232,7 @@ typedef enum ThsvsAccessType {
     THSVS_ACCESS_COMPUTE_SHADER_WRITE,                                      // Written as any resource in a compute shader
     THSVS_ACCESS_ANY_SHADER_WRITE,                                          // Written as any resource in any shader
     THSVS_ACCESS_TRANSFER_WRITE,                                            // Written as the destination of a transfer operation
+	THSVS_ACCESS_HOST_PREINITIALIZED,                                       // Data pre-filled by host before device access starts
     THSVS_ACCESS_HOST_WRITE,                                                // Written on the host
 
     THSVS_ACCESS_COLOR_ATTACHMENT_READ_WRITE,                               // Read or written as a color attachment during rendering
@@ -711,6 +712,10 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
     {   VK_PIPELINE_STAGE_TRANSFER_BIT,
         VK_ACCESS_TRANSFER_WRITE_BIT,
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL},
+    // THSVS_ACCESS_HOST_PREINITIALIZED
+    {   VK_PIPELINE_STAGE_HOST_BIT,
+        VK_ACCESS_HOST_WRITE_BIT,
+        VK_IMAGE_LAYOUT_PREINITIALIZED},
     // THSVS_ACCESS_HOST_WRITE
     {   VK_PIPELINE_STAGE_HOST_BIT,
         VK_ACCESS_HOST_WRITE_BIT,
