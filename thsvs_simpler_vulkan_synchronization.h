@@ -40,13 +40,18 @@ USAGE
 
 VERSION
 
+    alpha.8
+
+    Alpha.8 adds a host preinitialization state for linear images, as well as a number of new access sets for extensions released since the last update.
+
+
+VERSION HISTORY
+
     alpha.7
 
     Alpha.7 incorporates a number of fixes from @gwihlidal, and fixes
     handling of pipeline stages in the presence of multiple access types or
     barriers in light of other recent changes.
-
-VERSION HISTORY
 
     alpha.6
 
