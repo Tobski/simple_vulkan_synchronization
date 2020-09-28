@@ -182,9 +182,8 @@ typedef enum ThsvsAccessType {
     THSVS_ACCESS_NONE,                                                      // No access. Useful primarily for initialization
 
 // Read access
-    // Requires VK_NVX_device_generated_commands to be enabled
-    THSVS_ACCESS_COMMAND_BUFFER_READ_NVX,                                   // Command buffer read operation as defined by NVX_device_generated_commands
-
+    // Requires VK_NV_device_generated_commands to be enabled
+    THSVS_ACCESS_COMMAND_BUFFER_READ_NV,                                    // Command buffer read operation as defined by NV_device_generated_commands
     THSVS_ACCESS_INDIRECT_BUFFER,                                           // Read as an indirect buffer for drawing or dispatch
     THSVS_ACCESS_INDEX_BUFFER,                                              // Read as an index buffer for drawing
     THSVS_ACCESS_VERTEX_BUFFER,                                             // Read as a vertex buffer for drawing
@@ -241,9 +240,8 @@ typedef enum ThsvsAccessType {
     THSVS_END_OF_READ_ACCESS,
 
 // Write access
-    // Requires VK_NVX_device_generated_commands to be enabled
-    THSVS_ACCESS_COMMAND_BUFFER_WRITE_NVX,                                  // Command buffer write operation
-
+    // Requires VK_NV_device_generated_commands to be enabled
+    THSVS_ACCESS_COMMAND_BUFFER_WRITE_NV,                                   // Command buffer write operation
     THSVS_ACCESS_VERTEX_SHADER_WRITE,                                       // Written as any resource in a vertex shader
     THSVS_ACCESS_TESSELLATION_CONTROL_SHADER_WRITE,                         // Written as any resource in a tessellation control shader
     THSVS_ACCESS_TESSELLATION_EVALUATION_SHADER_WRITE,                      // Written as any resource in a tessellation evaluation shader
@@ -553,9 +551,9 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
         VK_IMAGE_LAYOUT_UNDEFINED},
 
 // Read Access
-    // THSVS_ACCESS_COMMAND_BUFFER_READ_NVX
-    {   VK_PIPELINE_STAGE_COMMAND_PROCESS_BIT_NVX,
-        VK_ACCESS_COMMAND_PROCESS_READ_BIT_NVX,
+    // THSVS_ACCESS_COMMAND_BUFFER_READ_NV
+    {   VK_PIPELINE_STAGE_COMMAND_PREPROCESS_BIT_NV,
+        VK_ACCESS_COMMAND_PREPROCESS_READ_BIT_NV,
         VK_IMAGE_LAYOUT_UNDEFINED},
     // THSVS_ACCESS_INDIRECT_BUFFER
     {   VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
@@ -755,11 +753,10 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
         VK_IMAGE_LAYOUT_UNDEFINED},
 
 // Write access
-    // THSVS_ACCESS_COMMAND_BUFFER_WRITE_NVX
-    {   VK_PIPELINE_STAGE_COMMAND_PROCESS_BIT_NVX,
-        VK_ACCESS_COMMAND_PROCESS_WRITE_BIT_NVX,
+    // THSVS_ACCESS_COMMAND_BUFFER_WRITE_NV
+    {   VK_PIPELINE_STAGE_COMMAND_PREPROCESS_BIT_NV,
+        VK_ACCESS_COMMAND_PREPROCESS_WRITE_BIT_NV,
         VK_IMAGE_LAYOUT_UNDEFINED},
-
     // THSVS_ACCESS_VERTEX_SHADER_WRITE
     {   VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
         VK_ACCESS_SHADER_WRITE_BIT,
