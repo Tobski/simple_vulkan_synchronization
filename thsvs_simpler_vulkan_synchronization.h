@@ -930,6 +930,10 @@ void thsvsGetVulkanBufferMemoryBarrier(
     pVkBarrier->offset              = thBarrier.offset;
     pVkBarrier->size                = thBarrier.size;
 
+#ifdef THSVS_ERROR_CHECK_COULD_USE_GLOBAL_BARRIER
+    assert(pVkBarrier->srcQueueFamilyIndex != pVkBarrier->dstQueueFamilyIndex);
+#endif
+
     for (uint32_t i = 0; i < thBarrier.prevAccessCount; ++i)
     {
         ThsvsAccessType prevAccess = thBarrier.pPrevAccesses[i];
@@ -1054,10 +1058,6 @@ void thsvsGetVulkanImageMemoryBarrier(
 #endif
             pVkBarrier->oldLayout = layout;
         }
-
-#ifdef THSVS_ERROR_CHECK_COULD_USE_GLOBAL_BARRIER
-    assert(pVkBarrier->srcQueueFamilyIndex != pVkBarrier->dstQueueFamilyIndex);
-#endif
     }
 
     for (uint32_t i = 0; i < thBarrier.nextAccessCount; ++i)
