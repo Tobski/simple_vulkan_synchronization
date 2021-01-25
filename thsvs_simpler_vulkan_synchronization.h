@@ -381,10 +381,10 @@ destination pipeline stages, and a VkMemoryBarrier, that can be used with
 Vulkan's synchronization methods.
 */
 void thsvsGetVulkanMemoryBarrier(
-    ThsvsGlobalBarrier      thBarrier,
-    VkPipelineStageFlags*   pSrcStages,
-    VkPipelineStageFlags*   pDstStages,
-    VkMemoryBarrier*        pVkBarrier);
+    const ThsvsGlobalBarrier& thBarrier,
+    VkPipelineStageFlags*     pSrcStages,
+    VkPipelineStageFlags*     pDstStages,
+    VkMemoryBarrier*          pVkBarrier);
 
 /*
 Mapping function that translates a buffer barrier into a set of source and
@@ -392,10 +392,10 @@ destination pipeline stages, and a VkBufferMemoryBarrier, that can be used
 with Vulkan's synchronization methods.
 */
 void thsvsGetVulkanBufferMemoryBarrier(
-    ThsvsBufferBarrier      thBarrier,
-    VkPipelineStageFlags*   pSrcStages,
-    VkPipelineStageFlags*   pDstStages,
-    VkBufferMemoryBarrier*  pVkBarrier);
+    const ThsvsBufferBarrier& thBarrier,
+    VkPipelineStageFlags*     pSrcStages,
+    VkPipelineStageFlags*     pDstStages,
+    VkBufferMemoryBarrier*    pVkBarrier);
 
 /*
 Mapping function that translates an image barrier into a set of source and
@@ -403,10 +403,10 @@ destination pipeline stages, and a VkBufferMemoryBarrier, that can be used
 with Vulkan's synchronization methods.
 */
 void thsvsGetVulkanImageMemoryBarrier(
-    ThsvsImageBarrier      thBarrier,
-    VkPipelineStageFlags*  pSrcStages,
-    VkPipelineStageFlags*  pDstStages,
-    VkImageMemoryBarrier*  pVkBarrier);
+    const ThsvsImageBarrier& thBarrier,
+    VkPipelineStageFlags*    pSrcStages,
+    VkPipelineStageFlags*    pDstStages,
+    VkImageMemoryBarrier*    pVkBarrier);
 
 /*
 Simplified wrapper around vkCmdPipelineBarrier.
@@ -848,10 +848,10 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
 };
 
 void thsvsGetVulkanMemoryBarrier(
-    ThsvsGlobalBarrier      thBarrier,
-    VkPipelineStageFlags*   pSrcStages,
-    VkPipelineStageFlags*   pDstStages,
-    VkMemoryBarrier*        pVkBarrier)
+    const ThsvsGlobalBarrier& thBarrier,
+    VkPipelineStageFlags*     pSrcStages,
+    VkPipelineStageFlags*     pDstStages,
+    VkMemoryBarrier*          pVkBarrier)
 {
     *pSrcStages               = 0;
     *pDstStages               = 0;
@@ -913,10 +913,10 @@ void thsvsGetVulkanMemoryBarrier(
 }
 
 void thsvsGetVulkanBufferMemoryBarrier(
-    ThsvsBufferBarrier      thBarrier,
-    VkPipelineStageFlags*   pSrcStages,
-    VkPipelineStageFlags*   pDstStages,
-    VkBufferMemoryBarrier*  pVkBarrier)
+    const ThsvsBufferBarrier& thBarrier,
+    VkPipelineStageFlags*     pSrcStages,
+    VkPipelineStageFlags*     pDstStages,
+    VkBufferMemoryBarrier*    pVkBarrier)
 {
     *pSrcStages                     = 0;
     *pDstStages                     = 0;
@@ -929,6 +929,10 @@ void thsvsGetVulkanBufferMemoryBarrier(
     pVkBarrier->buffer              = thBarrier.buffer;
     pVkBarrier->offset              = thBarrier.offset;
     pVkBarrier->size                = thBarrier.size;
+
+#ifdef THSVS_ERROR_CHECK_COULD_USE_GLOBAL_BARRIER
+    assert(pVkBarrier->srcQueueFamilyIndex != pVkBarrier->dstQueueFamilyIndex);
+#endif
 
     for (uint32_t i = 0; i < thBarrier.prevAccessCount; ++i)
     {
@@ -984,10 +988,10 @@ void thsvsGetVulkanBufferMemoryBarrier(
 }
 
 void thsvsGetVulkanImageMemoryBarrier(
-    ThsvsImageBarrier       thBarrier,
-    VkPipelineStageFlags*   pSrcStages,
-    VkPipelineStageFlags*   pDstStages,
-    VkImageMemoryBarrier*   pVkBarrier)
+    const ThsvsImageBarrier& thBarrier,
+    VkPipelineStageFlags*    pSrcStages,
+    VkPipelineStageFlags*    pDstStages,
+    VkImageMemoryBarrier*    pVkBarrier)
 {
     *pSrcStages                     = 0;
     *pDstStages                     = 0;
@@ -1054,10 +1058,6 @@ void thsvsGetVulkanImageMemoryBarrier(
 #endif
             pVkBarrier->oldLayout = layout;
         }
-
-#ifdef THSVS_ERROR_CHECK_COULD_USE_GLOBAL_BARRIER
-    assert(pVkBarrier->srcQueueFamilyIndex != pVkBarrier->dstQueueFamilyIndex);
-#endif
     }
 
     for (uint32_t i = 0; i < thBarrier.nextAccessCount; ++i)
