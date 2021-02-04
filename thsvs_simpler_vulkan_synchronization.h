@@ -376,6 +376,18 @@ typedef struct ThsvsImageBarrier {
 } ThsvsImageBarrier;
 
 /*
+Mapping function that translates a set of accesses into the corresponding
+pipeline stages, VkAccessFlags, and image layout.
+*/
+void thsvsGetAccessInfo(
+    uint32_t               accessCount,
+    const ThsvsAccessType* pAccesses,
+    VkPipelineStageFlags*  pStageMask,
+    VkAccessFlags*         pAccessMask,
+    VkImageLayout*         pImageLayout,
+    bool*                  pHasWriteAccess);
+
+/*
 Mapping function that translates a global barrier into a set of source and
 destination pipeline stages, and a VkMemoryBarrier, that can be used with
 Vulkan's synchronization methods.
@@ -847,6 +859,52 @@ const ThsvsVkAccessInfo ThsvsAccessMap[THSVS_NUM_ACCESS_TYPES] = {
         VK_IMAGE_LAYOUT_GENERAL}
 };
 
+void thsvsGetAccessInfo(
+    uint32_t               accessCount,
+    const ThsvsAccessType* pAccesses,
+    VkPipelineStageFlags*  pStageMask,
+    VkAccessFlags*         pAccessMask,
+    VkImageLayout*         pImageLayout,
+    bool*                  pHasWriteAccess)
+{
+    *pStageMask   = 0;
+    *pAccessMask  = 0;
+    *pImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    *pHasWriteAccess = false;
+
+    for (uint32_t i = 0; i < accessCount; ++i)
+    {
+        ThsvsAccessType access = pAccesses[i];
+        const ThsvsVkAccessInfo* pAccessInfo = &ThsvsAccessMap[access];
+
+#ifdef THSVS_ERROR_CHECK_ACCESS_TYPE_IN_RANGE
+        // Asserts that the previous access index is a valid range for the lookup
+        assert(access < THSVS_NUM_ACCESS_TYPES);
+#endif
+
+#ifdef THSVS_ERROR_CHECK_POTENTIAL_HAZARD
+        // Asserts that the access is a read, else it's a write and it should appear on its own.
+        assert(access < THSVS_END_OF_READ_ACCESS || accessCount == 1);
+#endif
+
+        *pStageMask |= pAccessInfo->stageMask;
+
+        if (access > THSVS_END_OF_READ_ACCESS)
+            *pHasWriteAccess = true;
+
+        *pAccessMask |= pAccessInfo->accessMask;
+
+        VkImageLayout layout = pAccessInfo->imageLayout;
+
+#ifdef THSVS_ERROR_CHECK_MIXED_IMAGE_LAYOUT
+        assert(*pImageLayout == VK_IMAGE_LAYOUT_UNDEFINED ||
+               *pImageLayout == layout);
+#endif
+
+        *pImageLayout = layout;
+    }
+}
+
 void thsvsGetVulkanMemoryBarrier(
     const ThsvsGlobalBarrier& thBarrier,
     VkPipelineStageFlags*     pSrcStages,
@@ -899,7 +957,7 @@ void thsvsGetVulkanMemoryBarrier(
         *pDstStages |= pNextAccessInfo->stageMask;
 
         // Add visibility operations as necessary.
-        // If the src access mask, this is a WAR hazard (or for some reason a "RAR"),
+        // If the src access mask is zero, this is a WAR hazard (or for some reason a "RAR"),
         // so the dst access mask can be safely zeroed as these don't need visibility.
         if (pVkBarrier->srcAccessMask != 0)
             pVkBarrier->dstAccessMask |= pNextAccessInfo->accessMask;
@@ -974,7 +1032,7 @@ void thsvsGetVulkanBufferMemoryBarrier(
         *pDstStages |= pNextAccessInfo->stageMask;
 
         // Add visibility operations as necessary.
-        // If the src access mask, this is a WAR hazard (or for some reason a "RAR"),
+        // If the src access mask is zero, this is a WAR hazard (or for some reason a "RAR"),
         // so the dst access mask can be safely zeroed as these don't need visibility.
         if (pVkBarrier->srcAccessMask != 0)
             pVkBarrier->dstAccessMask |= pNextAccessInfo->accessMask;
@@ -1078,7 +1136,7 @@ void thsvsGetVulkanImageMemoryBarrier(
         *pDstStages |= pNextAccessInfo->stageMask;
 
         // Add visibility operations as necessary.
-        // If the src access mask, this is a WAR hazard (or for some reason a "RAR"),
+        // If the src access mask is zero, this is a WAR hazard (or for some reason a "RAR"),
         // so the dst access mask can be safely zeroed as these don't need visibility.
         if (pVkBarrier->srcAccessMask != 0)
             pVkBarrier->dstAccessMask |= pNextAccessInfo->accessMask;
