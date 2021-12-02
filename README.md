@@ -20,11 +20,15 @@ will be generated in that file.
 
 ## Version
 
+alpha.9
+
+Alpha.9 adds the thsvsGetAccessInfo function to translate access types into a thsvsVkAccessInfo.
+    
+## Version History
+
 alpha.8
 
 Alpha.8 adds a host preinitialization state for linear images, as well as a number of new access sets for extensions released since the last update.
-
-## Version History
 
 alpha.7
 
